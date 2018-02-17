@@ -2,11 +2,6 @@ import { Command } from "./Command";
 
 export class Func extends Command {
 
-  constructor(callback: (f: Func) => void, immediatelyComplete: boolean = true) {
-    super();
-    this.callback = callback;
-    this.immediatelyComplete = immediatelyComplete;
-  }
 
   public execute():void {
     if (this.immediatelyComplete) {
@@ -20,4 +15,10 @@ export class Func extends Command {
 
   private callback: (f: Func) => void;
   private immediatelyComplete: boolean;
+
+  constructor(callback: (f: Func) => void, immediatelyComplete: boolean = true) {
+    super();
+    this.callback = callback;
+    this.immediatelyComplete = immediatelyComplete;
+  }
 }

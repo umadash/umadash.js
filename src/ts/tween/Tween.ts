@@ -1,5 +1,5 @@
-import { EventDispatcher } from './../events/EventDispatcher';
 import { Easing } from './Easing'
+import { EventDispatcher } from '../event/EventDispatcher';
 
 export class Tween extends EventDispatcher {
 
@@ -51,7 +51,6 @@ export class Tween extends EventDispatcher {
       }
     }
     else {
-      this.begin = $.extend(true, {}, this.from);
     }
 
     // スタート

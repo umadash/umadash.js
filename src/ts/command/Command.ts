@@ -1,7 +1,7 @@
-import { EventDispatcher } from './../events/EventDispatcher';
-import { EventName } from '../vars/EventName';
+import { EventDispatcher } from './../event/EventDispatcher';
+import { EventName } from '../var/EventName';
 
-export class Command extends EventDispatcher{
+export class Command extends EventDispatcher {
   constructor() {
     super();
   }

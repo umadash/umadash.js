@@ -1,4 +1,5 @@
 import { Command } from './Command';
+
 export class SerialList extends Command {
   constructor(commands = null) {
     super();
@@ -28,7 +29,7 @@ export class SerialList extends Command {
 
   public next() {
     if (this.commands.length > 0) {
-      const nextCommand = this.commands.shift();
+      const nextCommand:Command = this.commands.shift();
       const callback = () => {
         nextCommand.removeEventListener('complete', callback);
        if (this.flgCancel) return;

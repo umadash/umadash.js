@@ -1,5 +1,5 @@
-import { EventDispatcher, EventListener } from './../events/EventDispatcher';
 import { Command } from "./Command";
+import { EventDispatcher, EventListener } from "../event/EventDispatcher";
 
 export class Listen extends Command {
 
