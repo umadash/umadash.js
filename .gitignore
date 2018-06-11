@@ -26,7 +26,3 @@ bin-release-temp/
 
 ### Node.js ###
 **/node_modules/
-
-
-### Project ###
-src/**/*.js
