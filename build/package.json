@@ -1,18 +1,12 @@
 {
   "devDependencies": {
-    "@types/jquery": "^3.2.16",
-    "@types/node": "^8.0.54",
     "awesome-typescript-loader": "^3.4.1",
+    "browser-sync": "^2.24.4",
+    "gulp-plumber": "^1.2.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-typescript": "^4.0.2",
+    "gulp-uglify": "^3.0.0",
     "source-map-loader": "^0.2.3",
-    "typescript": "^2.6.2",
-    "webpack": "^3.9.1"
-  },
-  "scripts": {
-    "build": "webpack -p --colors --watch",
-    "build:js": "webpack --debug --devtool inline-source-map --progress --colors --watch"
-  },
-  "dependencies": {
-    "jquery": "^3.2.1",
-    "jquery-lazyload": "^1.9.7"
+    "typescript": "^2.6.2"
   }
 }
