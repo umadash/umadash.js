@@ -1,5 +1,5 @@
-import { Command } from './../commands/Command';
-import {DoTween} from '../commands/DoTween'
+import { Command } from './../command/Command';
+import {DoTween} from '../command/DoTween'
 import {Easing} from '../tween/Easing'
 
 export class JqueryUtil {

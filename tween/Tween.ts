@@ -3,6 +3,11 @@ import { EventDispatcher } from '../event/EventDispatcher';
 
 export class Tween extends EventDispatcher {
 
+  // --------------------------------------------------
+  //
+  // CONSTRUCTOR
+  //
+  // --------------------------------------------------
   constructor(target:any, to:object, from:object = null, duration:number = 1000, easing:any = Easing.linear, onStart:any = null, onUpdate:any = null, onComplete:any = null) {
     super();
 
@@ -27,9 +32,11 @@ export class Tween extends EventDispatcher {
     }
   }
 
-  /**
-   * 開始
-   */
+  // --------------------------------------------------
+  //
+  // METHOD
+  //
+  // --------------------------------------------------
   public start():void {
     // すでに開始されていたらストップ
     this.stop();
@@ -49,8 +56,6 @@ export class Tween extends EventDispatcher {
         const key = keys[i];
         this.begin[key] = this.target[key];
       }
-    }
-    else {
     }
 
     // スタート
@@ -78,6 +83,7 @@ export class Tween extends EventDispatcher {
         this.stop();
         if (this.onUpdate) this.onUpdate();
         if (this.onComplete) this.onComplete();
+        return;
       }
       else {
         const t = past * .001;

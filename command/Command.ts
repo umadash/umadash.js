@@ -1,11 +1,29 @@
 import { EventDispatcher } from './../event/EventDispatcher';
-import { EventName } from '../var/EventName';
 
 export class Command extends EventDispatcher {
+
+  // --------------------------------------------------
+  //
+  // MEMBER
+  //
+  // --------------------------------------------------
+  public static Complete: string = 'complete';
+
+
+  // --------------------------------------------------
+  //
+  // CONSTRUCTOR
+  //
+  // --------------------------------------------------
   constructor() {
     super();
   }
 
+  // --------------------------------------------------
+  //
+  // METHOD
+  //
+  // --------------------------------------------------
   public execute(): void {}
   public interrupt(): void {}
   public complete(): void {
@@ -13,6 +31,6 @@ export class Command extends EventDispatcher {
   }
 
   protected notifyComplete() {
-    this.dispatchEvent(EventName.Complete);
+    this.dispatchEvent(Command.Complete);
   }
 }

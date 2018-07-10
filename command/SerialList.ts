@@ -1,13 +1,34 @@
 import { Command } from './Command';
 
 export class SerialList extends Command {
+
+  // --------------------------------------------------
+  //
+  // MEMBER
+  //
+  // --------------------------------------------------
+  private commands: Command[];
+  private currentCommand: Command;
+  private flgCancel: boolean;
+
+  // --------------------------------------------------
+  //
+  // CONSTRUCTOR
+  //
+  // --------------------------------------------------
   constructor(commands = null) {
     super();
+
     this.commands = commands;
     this.currentCommand = null;
     this.flgCancel = false;
   }
 
+  // --------------------------------------------------
+  //
+  // METHOD
+  //
+  // --------------------------------------------------
   public execute() {
     if (this.commands == null) return;
 
@@ -48,10 +69,8 @@ export class SerialList extends Command {
   public interrupt() {
     if (this.commands == null) return;
 
-    // キャンセルフラグを立てる
     this.flgCancel = true;
 
-    // 念のため全てのコマンドを中断
     this.interruptAllCommands();
   }
 
@@ -60,7 +79,6 @@ export class SerialList extends Command {
       this.currentCommand.interrupt();
     }
 
-    // 残りのコマンド
     const length = this.commands.length;
     for (let i = 0; i < length; i += 1) {
       const command = this.commands[i];
@@ -68,8 +86,5 @@ export class SerialList extends Command {
     }
   }
 
-  private commands: Command[];
-  private currentCommand: Command;
-  private flgCancel: boolean;
 
 }
