@@ -82,7 +82,11 @@ export class WindowWatcher {
         return WindowWatcher.$watcher.scrollTop();
     }
 
-    public static $watcher: JQuery = $(window);
+    public static getWatcher(): JQuery {
+        return this.$watcher;
+    }
+
+    public static $watcher: JQuery = $(<any>window);
     private static scrollHandlers: Object = {};
     private static resizeHandlers: Object = {};
     private static windowWidth: number = -9999;
