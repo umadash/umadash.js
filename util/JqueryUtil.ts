@@ -4,12 +4,13 @@ import {Easing} from '../tween/Easing'
 
 export class JqueryUtil {
 
-  public static removeClass($target, pattern) {
+  public static removeClass($target: JQuery, pattern: string): JQuery {
     $target.removeClass(function(index, className) {
         const str = '\\b' + pattern + '\\S+';
         const reg = new RegExp(str, 'g');
         return (className.match(reg) || []).join(' ');
     });
+    return $target;
   }
 
   public static fadeTo($target, opacity, duration, easing = Easing.linear, switchDisplayTo = "", switchVisibility = false, execute = false): Command {
