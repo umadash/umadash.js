@@ -2,7 +2,7 @@ export class KeyWatcher {
 
     private static KeyDown: string = 'keydown';
     private static KeyUp: string = 'keyup';
-    private static watcher: JQuery = $(document);
+    private static watcher: any = $(document);
 
 
     private static createId(eventName: string, id: string): string {
