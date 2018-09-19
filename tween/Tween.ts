@@ -57,6 +57,12 @@ export class Tween extends EventDispatcher {
         this.begin[key] = this.target[key];
       }
     }
+    else {
+      for (let i = 0; i < nKeys; i += 1) {
+        const key = keys[i];
+        this.target[key] = this.begin[key];
+      }
+    }
 
     // スタート
     if (this.onStart) this.onStart();
