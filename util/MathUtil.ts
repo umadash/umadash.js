@@ -9,7 +9,7 @@ export class MathUtil {
      * @returns {number} 回転角度
      */
     public static turn(from:number, to:number, radian:boolean = true):number {
-        return radian ? ((to - from + this.PI_3) % this.PI_2 - this.PI) : ((to - from + 540) % 360 - 180);
+        return radian ? ((to - from + this.PI3) % this.PI2 - this.PI) : ((to - from + 540) % 360 - 180);
     }
 
     /**
@@ -70,6 +70,7 @@ export class MathUtil {
 
     static PI: number = Math.PI;
     static PI2: number = MathUtil.PI * 2;
+    static PI3: number = MathUtil.PI * 3;
     static PI_2: number = MathUtil.PI / 2;
     static PI_3: number = MathUtil.PI / 3;
     static PI_4: number = MathUtil.PI / 4;
