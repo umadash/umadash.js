@@ -1,4 +1,16 @@
 export class MathUtil {
+    /**
+     * turn 
+     * 
+     * ある角度からある角度への回転角度を取得する
+     * @param {number} from 元の角度
+     * @param {number} to 目標の角度
+     * @param {boolean} radian trueの場合はラジアン法で計算する
+     * @returns {number} 回転角度
+     */
+    public static turn(from:number, to:number, radian:boolean = true):number {
+        return radian ? ((to - from + this.PI_3) % this.PI_2 - this.PI) : ((to - from + 540) % 360 - 180);
+    }
 
     /**
      *  clamp
