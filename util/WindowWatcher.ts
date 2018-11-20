@@ -1,10 +1,11 @@
+const $ = require('jquery');
 import { Throttle } from './Throttle';
 
 export class WindowWatcher {
     private static eventScroll: string = 'scroll';
     private static eventResize: string = 'resize';
 
-    private static startWatching(eventName: string, handler: any, handlers: Object, id: string = '', throttle: number = 0, execute: boolean = true): void {
+    private static startWatching(eventName: string, handler: () => void, handlers: Object, id: string = '', throttle: number = 0, execute: boolean = true): void {
         const $watcher: JQuery = WindowWatcher.$watcher;
 
         if (Object.keys(handlers).length < 1) {
@@ -21,7 +22,7 @@ export class WindowWatcher {
         if (execute) handler();
     }
 
-    private static stopWatching(eventName: string, handlers: Object, id: string = null): void {
+    private static stopWatching(eventName: string, handlers: Object, id?: string): void {
         if (id) {
             delete handlers[id];
         }
@@ -34,35 +35,35 @@ export class WindowWatcher {
     /**
      * Scroll
      */
-    public static startWatchingScroll(handler: any, id: string = '', throttle: number = 0, execute: boolean = true): void {
+    public static startWatchingScroll(handler: () => void, id: string = '', throttle: number = 0, execute: boolean = true): void {
         this.startWatching(this.eventScroll, handler, this.scrollHandlers, id, throttle, execute);
     }
 
-    public static stopWatchingScroll(id: string = null): void {
+    public static stopWatchingScroll(id?: string): void {
         this.stopWatching(this.eventScroll, this.scrollHandlers, id);
     }
 
     /**
      * Resize
      */
-    public static startWatchingResize(handler: any, id: string = '', throttle: number = 0, execute: boolean = true): void {
-        this.startWatching(this.eventResize, handler, () => {
+    public static startWatchingResize(handler: () => void, id: string = '', throttle: number = 0, execute: boolean = true): void {
+        this.startWatching(this.eventResize, () => {
             const windowWidth: number = window.innerWidth;
             if (windowWidth != this.windowWidth) {
                 handler();
                 this.windowWidth = windowWidth;
             }
-        }, id, throttle, execute);
+        }, this.resizeHandlers, id, throttle, execute);
     }
 
-    public static stopWatchingResize(id: string = null): void {
+    public static stopWatchingResize(id?: string): void {
         this.stopWatching(this.eventResize, this.resizeHandlers, id);
     }
 
     /**
      * Focus
      */
-    public static startWatchingFocus(handler: any, execute: boolean = true): void {
+    public static startWatchingFocus(handler: () => void, execute: boolean = true): void {
         WindowWatcher.$watcher.focus(handler);
         if (execute) handler();
     }
@@ -70,7 +71,7 @@ export class WindowWatcher {
     /**
      * Blur
      */
-    public static startWatchingBlur(handler: any, execute: boolean = true): void {
+    public static startWatchingBlur(handler: () => void, execute: boolean = true): void {
         WindowWatcher.$watcher.blur(handler);
         if (execute) handler();
     }

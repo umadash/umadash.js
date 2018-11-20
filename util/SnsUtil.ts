@@ -1,14 +1,20 @@
+const $ = require('jquery');
+
 export class SnsUtil {
 
-    public static enable($facebook: JQuery = null, $twitter: JQuery = null, $hatena: JQuery = null, $line: JQuery = null): void {
+    public static enable($facebook?: JQuery, $twitter?: JQuery, $hatena?: JQuery, $line?: JQuery): void {
         if ($facebook) this.setupFacebook($facebook);
         if ($twitter)  this.setupTwitter($twitter);
         if ($hatena)  this.setupHatena($hatena);
         if ($line)  this.setupLine($line);
     }
 
-    public static openTwitterWindow(text: string, url: string, hashtags: string): void {
-        const shareUrl = "http://twitter.com/share?text=" + text + "&url=" + url + "&hashtags=" + hashtags;
+    public static openTwitterWindow(text: string, url: string, hashtags: string = ""): void {
+        let shareUrl = "http://twitter.com/share?text=" + text + "&url=" + url;
+        if (hashtags) {
+            shareUrl += `&hashtags=${hashtags}`;
+        }
+
         window.open(encodeURI(shareUrl), 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); 
     }
 
@@ -29,7 +35,7 @@ export class SnsUtil {
         
     static setupHatena($target: JQuery): void {
         $target.on('click', function(e) {
-            const $target = $(e.target);
+            const $target = $(e.currentTarget);
             const url = $target.attr('data-url') || "";
             SnsUtil.openHatena(url);
         });
@@ -37,7 +43,7 @@ export class SnsUtil {
 
     static setupFacebook($target: JQuery): void {
         $target.on('click', function(e) {
-            const $target = $(e.target);
+            const $target = $(e.currentTarget);
             const url = $target.attr('data-url') || "";
             SnsUtil.openFacebookWindow(url);
         });
@@ -45,8 +51,8 @@ export class SnsUtil {
 
     private static setupTwitter($target: JQuery): void {
         $target.on('click', function(e) {
-            const $target = $(e.target);
-            const text = $target.attr('data-text') || "";
+            const $target = $(e.currentTarget);
+            const text = $target.attr('data-txt') || "";
             const url = $target.attr('data-url') || "";
             const hashtags = $target.attr('data-hashtags') || "";
             SnsUtil.openTwitterWindow(text, url, hashtags);
@@ -55,8 +61,8 @@ export class SnsUtil {
 
     static setupLine($target: JQuery): void {
         $target.on('click', function(e) {
-            const $target = $(e.target);
-            const text = $target.attr('data-text') || "";
+            const $target = $(e.currentTarget);
+            const text = $target.attr('data-txt') || "";
             const url = $target.attr('data-url') || "";
             SnsUtil.openLine(text, url);
         });
