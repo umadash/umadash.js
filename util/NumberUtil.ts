@@ -1,6 +1,6 @@
 export class NumberUtil {
   
-  static addZeroIfNeed(num: number): string {
+  public static addZeroIfNeed(num: number): string {
     if (num < 10) {
       return '0' + num;
     }
@@ -8,15 +8,15 @@ export class NumberUtil {
   }
 
   // カンマ区切りにする
-  static separate(num, separate = ','){
-      // 文字列にする
-      num = num + "";
-      const len = num.length;
+  public static separate(num: number, separate: string = ','): string {
+    // 文字列にする
+    let numString = num + "";
+    const len = numString.length;
 
-      if(len > 3){
-          return NumberUtil.separate(num.substring(0, len - 3)) + separate + num.substring(len - 3);
-      } else {
-          return num;
-      }
+    if(len > 3){
+      return NumberUtil.separate(parseFloat(numString.substring(0, len - 3))) + separate + numString.substring(len - 3);
+    } else {
+      return numString;
+    }
   }
 }
