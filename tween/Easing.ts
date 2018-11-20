@@ -1,4 +1,5 @@
 // reference: https://github.com/danro/jquery-easing/blob/master/jquery.easing.js
+
 export const Easing = {
   linear: (t:number, b:number, c:number, d:number) => {
     return  c * (t / d) + b;
@@ -114,17 +115,17 @@ export const Easing = {
   },
 
 
-  easeInBack: (t, b, c, d, s) => {
-  if (s == undefined) s = 1.70158;
-  return c*(t/=d)*t*((s+1)*t - s) + b;
+  easeInBack: (t: number, b: number, c: number, d: number) => {
+    const s: number = 1.70158;
+    return c*(t/=d)*t*((s+1)*t - s) + b;
   },
-  easeOutBack: (t, b, c, d, s) => {
-  if (s == undefined) s = 1.70158;
-  return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+  easeOutBack: (t: number, b: number, c: number, d: number) => {
+    const s: number = 1.70158;
+    return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
   },
-  easeInOutBack: (t, b, c, d, s) => {
-  if (s == undefined) s = 1.70158; 
-  if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
-  return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
+  easeInOutBack: (t: number, b: number, c: number, d: number) => {
+    let s: number = 1.70158; 
+    if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
+    return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
   }
 }
