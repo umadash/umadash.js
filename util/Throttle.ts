@@ -1,11 +1,11 @@
 export class Throttle {
 
     private interval: number;
-    private callback: () => {};
+    private callback: () => void;
     private timer: any = null;
     private lastExecuteTime: number = null;
 
-    constructor(interval: number, callback: () => {}) {
+    constructor(interval: number, callback: () => void) {
         this.interval = interval;
         this.callback = callback;
     }

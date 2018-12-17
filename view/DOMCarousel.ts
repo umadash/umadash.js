@@ -17,7 +17,7 @@ export class DOMCarousel<T extends DOMCarouselItem> extends View<JQuery> {
     private items: T[] = [];
 
     private pool: ObjectPool<T>;
-    private speed: number = 0;
+    private speed: number = 1;
     private defaultSpeed: number = 0;
     private margin: number = 0;
     private request: number = -9999;
@@ -68,16 +68,20 @@ export class DOMCarousel<T extends DOMCarouselItem> extends View<JQuery> {
             this.models.push(txtDom);
         });
 
-        this.modelsLength = this.models.length;
-
         // オブジェクトプールを作る
+        this.modelsLength = this.models.length;
         this.pool = new ObjectPool<T>(
             this.onRequireItem, 
             (item: DOMCarouselItem) => { item.destoroy(); },
             this.modelsLength,
-            this.modelsLength
+            this.modelsLength * 2
         );
 
+        this.addEventListenerIfToucable();
+        this.resize();
+    }
+
+    private addEventListenerIfToucable(): void {
         if (this.touchable) {
 
             this.$elm.on('touchstart', (e) => {
@@ -124,11 +128,6 @@ export class DOMCarousel<T extends DOMCarouselItem> extends View<JQuery> {
             });
 
         }
-
-        
-
-        this.resize();
-        this.fill();
     }
 
     protected getShowCommand(): Command {
@@ -153,6 +152,7 @@ export class DOMCarousel<T extends DOMCarouselItem> extends View<JQuery> {
 
     public resize(): void {
         this.width = this.$elm.outerWidth();
+        this.fill();
     }
 
     public setMargin(value: number): void {
@@ -176,6 +176,7 @@ export class DOMCarousel<T extends DOMCarouselItem> extends View<JQuery> {
 
     private checkRightItem(): void {
         const item: T = this.items[this.items.length - 1];
+        if (!item) return;
         
         if (this.speed >= 0) {
             const left: number = item.tx;
@@ -222,6 +223,7 @@ export class DOMCarousel<T extends DOMCarouselItem> extends View<JQuery> {
 
     private checkLeftItem(): void {
         const item: T = this.items[0];
+        if (!item) return;
         
         if (this.speed >= 0) {
             
@@ -312,9 +314,19 @@ export class DOMCarousel<T extends DOMCarouselItem> extends View<JQuery> {
     
 
     private fill(): void {
+
+        // destroy current items 
+        for (let i = 0; i < this.items.length; i += 1) {
+            const item: T = this.items[i];
+            item.destoroy();
+            this.pool.returnItem(item);
+        }
+        this.items = [];
+
         // 子要素を空にする
         this.$elm.empty();
-        this.items = [];
+        
+        // TODO: pool 
 
         // 幅全てを埋めるまで子要素をDOMについかする
         let allWidth: number = 0;
