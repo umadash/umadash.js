@@ -1,96 +1,139 @@
-const $ = require('jquery');
-import { Throttle } from './Throttle';
+import { EventDispatcher } from '../event/EventDispatcher';
+import Event from '../event/Event';
 
-export class WindowWatcher {
-    private static eventScroll: string = 'scroll';
-    private static eventResize: string = 'resize';
+export class WindowWatcher extends EventDispatcher {
+    
+    private static instance: WindowWatcher;
+    public static Scroll: string = 'scroll';
+    public static Resize: string = 'resize';
 
-    private static startWatching(eventName: string, handler: () => void, handlers: Object, id: string = '', throttle: number = 0, execute: boolean = true): void {
-        const $watcher: JQuery = WindowWatcher.$watcher;
+    private onResizeHandler: () => void;
+    private onScrollHandler: () => void;
+    private prevScrollTop: number;
+    private prevWindowWidth: number;
+    private prevWindowHeight: number;
 
-        if (Object.keys(handlers).length < 1) {
-            $watcher.on(eventName, () => {
-                const now: number = Date.now();
-                Object.keys(handlers).forEach((key) => {
-                    const t: Throttle = handlers[key];
-                    t.execute(now);
-                });
-            });
+    private constructor() {
+        super();
+
+        this.init();
+    }
+
+    private init(): void {
+    }
+
+    private onScroll(): void {
+        const scrollTop: number = window.scrollY;
+        this.dispatchEvent(new ScrollEvent({
+            scrollTop,
+            prevScrollTop: this.prevScrollTop
+        }));
+
+        this.prevScrollTop = scrollTop;
+    }
+
+    private onResize(): void {
+        const windowWidth: number = window.innerWidth;
+        const windowHeight: number = window.innerHeight;       
+
+        this.dispatchEvent(new ResizeEvent({
+            windowWidth,
+            windowHeight,
+            horizontalChange: windowWidth != this.prevWindowWidth,
+            verticalChange: windowHeight != this.prevWindowHeight
+        }));
+
+        this.prevWindowWidth = windowWidth;
+        this.prevWindowHeight = windowHeight;
+    }
+
+    public start(): void {
+        this.prevScrollTop = window.scrollY;
+        this.prevWindowWidth = window.innerWidth;
+        this.prevWindowHeight = window.innerHeight;
+
+        this.onResizeHandler = this.onResize.bind(this);
+        this.onScrollHandler = this.onScroll.bind(this);
+
+        window.addEventListener(WindowWatcher.Resize, this.onResizeHandler);
+        window.addEventListener(WindowWatcher.Scroll, this.onScrollHandler);
+    }
+
+    public stop(): void {
+        window.removeEventListener(WindowWatcher.Resize, this.onResizeHandler);
+        window.removeEventListener(WindowWatcher.Scroll, this.onScrollHandler);
+        WindowWatcher.instance = null;
+    }
+
+    public static getInstance(): WindowWatcher {
+        if (!this.instance) {
+            this.instance = new WindowWatcher();
         }
+        return this.instance;
+    }
+}
 
-        handlers[id] = new Throttle(throttle, handler);
-        if (execute) handler();
+/**
+ * Resize
+ */
+interface IResizeEventData {
+    windowWidth: number,
+    windowHeight: number,
+    verticalChange: boolean,
+    horizontalChange: boolean
+}
+
+export class ResizeEvent extends Event {
+
+    constructor(data: IResizeEventData) {
+        super(WindowWatcher.Resize, data);
     }
 
-    private static stopWatching(eventName: string, handlers: Object, id?: string): void {
-        if (id) {
-            delete handlers[id];
-        }
-        else {
-            this.$watcher.off(eventName);
-        }
+    public getVerticalChange(): boolean {
+        const data: IResizeEventData = this.getData();
+        return data.verticalChange;
     }
 
-
-    /**
-     * Scroll
-     */
-    public static startWatchingScroll(handler: () => void, id: string = '', throttle: number = 0, execute: boolean = true): void {
-        this.startWatching(this.eventScroll, handler, this.scrollHandlers, id, throttle, execute);
+    public getHorizontalChange(): boolean {
+        const data: IResizeEventData = this.getData();
+        return data.horizontalChange;
     }
 
-    public static stopWatchingScroll(id?: string): void {
-        this.stopWatching(this.eventScroll, this.scrollHandlers, id);
+    public getWindowWidth(): number {
+        const data: IResizeEventData = this.getData();
+        return data.windowWidth;
     }
 
-    /**
-     * Resize
-     */
-    public static startWatchingResize(handler: () => void, id: string = '', throttle: number = 0, execute: boolean = true): void {
-        this.startWatching(this.eventResize, () => {
-            const windowWidth: number = window.innerWidth;
-            if (windowWidth != this.windowWidth) {
-                handler();
-                this.windowWidth = windowWidth;
-            }
-        }, this.resizeHandlers, id, throttle, execute);
+    public getWindowHeight(): number {
+        const data: IResizeEventData = this.getData();
+        return data.windowHeight;
+    }
+}
+
+/**
+ * Scroll
+ */
+
+interface IScrollEventData {
+    scrollTop: number,
+    prevScrollTop: number
+}
+
+export class ScrollEvent extends Event {
+    constructor(data: IScrollEventData) {
+        super(WindowWatcher.Scroll, data);
     }
 
-    public static stopWatchingResize(id?: string): void {
-        this.stopWatching(this.eventResize, this.resizeHandlers, id);
+    public getScrollData(): IScrollEventData {
+        return this.getData();
     }
 
-    /**
-     * Focus
-     */
-    public static startWatchingFocus(handler: () => void, execute: boolean = true): void {
-        WindowWatcher.$watcher.focus(handler);
-        if (execute) handler();
+    public getDiff(): number {
+        const data: IScrollEventData = this.getScrollData();
+        return data.scrollTop - data.prevScrollTop;
     }
 
-    /**
-     * Blur
-     */
-    public static startWatchingBlur(handler: () => void, execute: boolean = true): void {
-        WindowWatcher.$watcher.blur(handler);
-        if (execute) handler();
+    public getDown(): boolean {
+        return this.getDiff() >= 0;
     }
-
-    /**
-     * Util
-     */
-    public static getScrollTop(): number {
-        return WindowWatcher.$watcher.scrollTop();
-    }
-
-    public static getWatcher(): JQuery {
-        return this.$watcher;
-    }
-
-    public static $watcher: JQuery = $(<any>window);
-    private static scrollHandlers: Object = {};
-    private static resizeHandlers: Object = {};
-    private static windowWidth: number = -9999;
-
-    private constructor() {}
 }

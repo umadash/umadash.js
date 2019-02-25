@@ -3,6 +3,7 @@ import { Command } from "../command/Command";
 import { DoTween } from "../command/DoTween";
 import { WindowWatcher } from "./WindowWatcher";
 import { EventDispatcher } from "../event/EventDispatcher";
+import Event from "../event/Event";
 
 const $ = require('jquery');
 
@@ -28,7 +29,7 @@ export class SmoothScroll {
                 const position: number = top + this.offset;
 
                 // 現在のスクロール位置を取得
-                this.scrollTop = WindowWatcher.getScrollTop();
+                this.scrollTop = window.scrollY;
 
                 if (this.moveCommand) {
                     this.moveCommand.interrupt();
@@ -40,7 +41,7 @@ export class SmoothScroll {
                 });
 
                 // 移動イベントを通知
-                this.dispatcher.dispatchEvent(this.Move);
+                this.dispatcher.dispatchEvent(new Event(this.Move));
 
                 this.moveCommand.execute();
 

@@ -1,4 +1,9 @@
-export type EventListener = (target:EventDispatcher, data: object) => void;
+import Event from './Event';
+
+
+export type EventListener = (event: Event) => void;
+
+
 export class EventDispatcher {
 
   // --------------------------------------------------
@@ -47,14 +52,15 @@ export class EventDispatcher {
     }
   }
 
-  public dispatchEvent(eventName: string, data: any = null): void {
-    let listeners = this.listeners[eventName];
+  public dispatchEvent(event: Event): void {
+    event.setTarget(this);
+    let listeners = this.listeners[event.getName()];
     if (listeners == null) return;
 
     for (var i = 0, length = listeners.length; i < length; i += 1) {
       var listener = listeners[i];
       if (listener) {
-        listener(this, data);
+        listener(event);
       }
     }
   }

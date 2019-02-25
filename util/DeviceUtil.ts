@@ -8,5 +8,5 @@ export class DeviceUtil {
         return !DeviceUtil.isMobile();
     }
 
-    private static breakpoint:number = 800;
+    private static breakpoint:number = 768;
 }

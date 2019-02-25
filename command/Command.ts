@@ -1,4 +1,5 @@
 import { EventDispatcher } from './../event/EventDispatcher';
+import Event from '../event/Event';
 
 export class Command extends EventDispatcher {
 
@@ -31,6 +32,6 @@ export class Command extends EventDispatcher {
   }
 
   protected notifyComplete() {
-    this.dispatchEvent(Command.Complete);
+    this.dispatchEvent(new Event(Command.Complete));
   }
 }

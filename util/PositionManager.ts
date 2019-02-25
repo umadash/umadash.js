@@ -3,19 +3,22 @@ const $ = require('jquery');
 import { EventDispatcher } from "../event/EventDispatcher";
 import Event from "../event/Event";
 
-export class SectionWatcher extends EventDispatcher {
+export class PositionManager extends EventDispatcher {
 
     public static Change: string = 'change';
 
     private $sections: JQuery;
+    private ratio: number;
+
     private sections: JQuery[];
     private currentIndex: number;
     private prevScrollTop: number;
 
-    constructor($sections: JQuery) {
+    constructor($sections: JQuery, ratio: number = .5) {
         super();
 
         this.$sections = $sections;
+        this.ratio = ratio;
 
         this.sections = [];
         this.currentIndex = -1;
@@ -46,7 +49,7 @@ export class SectionWatcher extends EventDispatcher {
     }
 
     private getCenterPosition(scrollTop): number {
-        return window.innerHeight * .5 + scrollTop;
+        return window.innerHeight * this.ratio + scrollTop;
     }
 
     private checkDown(scrollTop: number): void {
@@ -59,7 +62,7 @@ export class SectionWatcher extends EventDispatcher {
 
         if (over) {
             this.currentIndex = nextIndex;
-            this.dispatchEvent(new Event(SectionWatcher.Change));
+            this.dispatchEvent(new Event(PositionManager.Change));
             
             this.checkDown(scrollTop);
         }
@@ -75,7 +78,7 @@ export class SectionWatcher extends EventDispatcher {
 
         if (over) {
             this.currentIndex = nextIndex - 1;
-            this.dispatchEvent(new Event(SectionWatcher.Change));
+            this.dispatchEvent(new Event(PositionManager.Change));
 
             this.checkUp(scrollTop);
         }

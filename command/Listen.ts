@@ -11,9 +11,8 @@ export class Listen extends Command {
  }
 
   public execute():void {
-    this.listener = function(target, data) {
+    this.listener = () => {
       this.target.removeEventListener(this.eventName, this.listener);
-      if (this.callback) this.callback();
       this.complete();
     };
     this.target.addEventListener(this.eventName, this.listener);
@@ -26,5 +25,5 @@ export class Listen extends Command {
 
   private target: EventDispatcher;
   private eventName: string;
-  private listener: EventListener;
+  private listener: () => void;
 }
