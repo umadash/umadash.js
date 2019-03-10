@@ -29,13 +29,7 @@ export class MathUtil {
      *  valueを範囲minA-maxAからminB-maxBへ変換する
      **/
     static map(value: number, minA: number, maxA: number, minB: number, maxB: number): number {
-        if (value < minA) {
-            value = minA;
-        } 
-        else if (value > maxA) {
-            value = maxA;
-        }
-        return (value - minA) * (maxB - minB) / (maxA - minA) + minB;
+        return (MathUtil.clamp(value, minA, minB) - minA) * (maxB - minB) / (maxA - minA) + minB;
     }
 
     /**
