@@ -4,13 +4,13 @@ import { ParallelList } from './../command/ParallelList';
 
 export class CommandUtil {
 
-    public static serial(execute: boolean = true, commands: Command[]): SerialList{
+    public static serial(commands: Command[], execute: boolean = true): SerialList{
         const serial = new SerialList(commands);
         if (execute) serial.execute();
         return serial;
     }
 
-    public static parallel(execute: boolean = true, commands: Command[]): ParallelList {
+    public static parallel(commands: Command[], execute: boolean = true): ParallelList {
         const parallel: ParallelList = new ParallelList(commands);
         if (execute) parallel.execute();
         return parallel;
