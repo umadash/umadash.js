@@ -10,7 +10,7 @@ export class CommandUtil {
         return serial;
     }
 
-    public static parallel(execute: boolean = true, commands: Command[]): ParallelList {
+    public static parallel(commands: Command[], execute: boolean = true): ParallelList {
         const parallel: ParallelList = new ParallelList(commands);
         if (execute) parallel.execute();
         return parallel;

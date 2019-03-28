@@ -20,7 +20,6 @@ export class Tween extends EventDispatcher {
     this.easing = easing;
 
     this.progressRate = 0;
-    this.progressTime = 0;
 
     this.timer = 0;
     this.onStart  = onStart;
@@ -75,7 +74,6 @@ export class Tween extends EventDispatcher {
 
       // 進行度
       const rate = past / this.duration;
-      this.progressTime = rate * this.duration;
       this.progressRate = rate;
 
       // 途中か完了か
@@ -149,5 +147,4 @@ export class Tween extends EventDispatcher {
   private startTime:number;
   private timer: any;
   private progressRate:number;
-  private progressTime:number;
 }
