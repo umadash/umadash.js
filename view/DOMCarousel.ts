@@ -1,4 +1,4 @@
-const $ = require('jquery');
+const $ = jQuery;
 
 import { View } from "./View";
 import { Command } from "../command/Command";

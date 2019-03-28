@@ -35,13 +35,15 @@ export class EventDispatcher {
     this.listeners[eventName].push(listener);
   }
 
-  public removeEventListener(eventName: string, listener: EventListener): void {
+  public removeEventListener(eventName: string, listener: EventListener = null): void {
     if (listener) {
-      let eventListeners = this.listeners[eventName];
-      for (let i = 0, length = eventListeners.length; i < length; i += 1) {
-        const l = eventListeners[i];
-        if (l === listener) {
-          eventListeners.splice(i, 1);
+      const eventListeners = this.listeners[eventName];
+      if (eventListeners) {
+        for (let i = 0, length = eventListeners.length; i < length; i += 1) {
+          const l = eventListeners[i];
+          if (l === listener) {
+            eventListeners.splice(i, 1);
+          }
         }
       }
     }
@@ -63,5 +65,9 @@ export class EventDispatcher {
         listener(event);
       }
     }
+  }
+
+  public dispatchEventType(type: string, data: any = null): void {
+    this.dispatchEvent(new Event(type, data));
   }
 }

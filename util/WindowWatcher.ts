@@ -13,6 +13,8 @@ export class WindowWatcher extends EventDispatcher {
     private prevWindowWidth: number;
     private prevWindowHeight: number;
 
+    private hasStarted: boolean;
+
     private constructor() {
         super();
 
@@ -20,10 +22,12 @@ export class WindowWatcher extends EventDispatcher {
     }
 
     private init(): void {
+        this.hasStarted = false;
+        this.prevScrollTop = 0;
     }
 
     private onScroll(): void {
-        const scrollTop: number = window.scrollY;
+        const scrollTop: number = window.pageYOffset;
         this.dispatchEvent(new ScrollEvent({
             scrollTop,
             prevScrollTop: this.prevScrollTop
@@ -48,7 +52,10 @@ export class WindowWatcher extends EventDispatcher {
     }
 
     public start(): void {
-        this.prevScrollTop = window.scrollY;
+        if (this.hasStarted) return;
+        this.hasStarted = true;
+        
+        this.prevScrollTop = window.pageYOffset;
         this.prevWindowWidth = window.innerWidth;
         this.prevWindowHeight = window.innerHeight;
 
@@ -63,6 +70,11 @@ export class WindowWatcher extends EventDispatcher {
         window.removeEventListener(WindowWatcher.Resize, this.onResizeHandler);
         window.removeEventListener(WindowWatcher.Scroll, this.onScrollHandler);
         WindowWatcher.instance = null;
+
+        this.onResizeHandler = null;
+        this.onScrollHandler = null;
+
+        this.hasStarted = false;
     }
 
     public static getInstance(): WindowWatcher {

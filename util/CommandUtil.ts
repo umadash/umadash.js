@@ -4,7 +4,7 @@ import { ParallelList } from './../command/ParallelList';
 
 export class CommandUtil {
 
-    public static serial(execute: boolean = true, commands: Command[]): SerialList{
+    public static serial(commands: Command[], execute: boolean = true): SerialList{
         const serial = new SerialList(commands);
         if (execute) serial.execute();
         return serial;

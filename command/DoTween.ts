@@ -9,12 +9,12 @@ export class DoTween extends Command {
   private from: any;
   private duration: number;
   private easing: any;
-  private onStart: any;
-  private onUpdate: any;
-  private onComplete: any;
+  private onStart: () => void;
+  private onUpdate: () => void;
+  private onComplete: () => void;
   private tween: Tween;
 
-  constructor(target, to, from = null, duration = 1000, easing = Easing.linear, onStart = null, onUpdate = null, onComplete = null) {
+  constructor(target: any, to: any, from: any = null, duration = 1000, easing = Easing.linear, onStart = null, onUpdate = null, onComplete = null) {
     super();
 
     this.target = target;

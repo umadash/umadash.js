@@ -3,6 +3,8 @@ import { EventDispatcher } from '../event/EventDispatcher';
 
 export class Tween extends EventDispatcher {
 
+  public static FPS: number = 60;
+
   // --------------------------------------------------
   //
   // CONSTRUCTOR
@@ -110,7 +112,7 @@ export class Tween extends EventDispatcher {
       }
     };
 
-    this.timer = setInterval(update, 1000 / 60);
+    this.timer = setInterval(update, 1000 / Tween.FPS);
   }
 
   public stop():void {
@@ -142,10 +144,10 @@ export class Tween extends EventDispatcher {
   private onStart:any;
   private onUpdate:any;
   private onComplete:any;
-
+  
   private begin:any;
   private startTime:number;
-  private timer:number;
+  private timer: any;
   private progressRate:number;
   private progressTime:number;
 }
