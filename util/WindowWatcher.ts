@@ -5,8 +5,8 @@ export class WindowWatcher extends EventDispatcher {
   private static instance: WindowWatcher;
   public static Scroll: string = "scroll";
   public static Resize: string = "resize";
-  public static VerticalResize: string = "VerticalResize";
-  public static HorizontalResize: string = "HorizontalResize";
+  public static VerticalResize: string = "verticalResize";
+  public static HorizontalResize: string = "horizontalResize";
 
   private onResizeHandler: () => void;
   private onScrollHandler: () => void;
@@ -84,42 +84,6 @@ export class WindowWatcher extends EventDispatcher {
       this.instance = new WindowWatcher();
     }
     return this.instance;
-  }
-}
-
-/**
- * Resize
- */
-interface IResizeEventData {
-  windowWidth: number;
-  windowHeight: number;
-  verticalChange: boolean;
-  horizontalChange: boolean;
-}
-
-export class ResizeEvent extends Event {
-  constructor(data: IResizeEventData) {
-    super(WindowWatcher.Resize, data);
-  }
-
-  public getVerticalChange(): boolean {
-    const data: IResizeEventData = this.getData();
-    return data.verticalChange;
-  }
-
-  public getHorizontalChange(): boolean {
-    const data: IResizeEventData = this.getData();
-    return data.horizontalChange;
-  }
-
-  public getWindowWidth(): number {
-    const data: IResizeEventData = this.getData();
-    return data.windowWidth;
-  }
-
-  public getWindowHeight(): number {
-    const data: IResizeEventData = this.getData();
-    return data.windowHeight;
   }
 }
 
