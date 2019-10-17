@@ -1,4 +1,4 @@
-import Easing from "../tween/Easing";
+import Easing, { EasingFunction } from "../tween/Easing";
 import Command from "../command/Command";
 import DoTween from "../command/DoTween";
 import { EventDispatcher } from "../event/EventDispatcher";
@@ -7,7 +7,7 @@ const $ = jQuery;
 
 export default class SmoothScroll extends EventDispatcher {
   private static instance: SmoothScroll;
-  public static Move: string = "move";
+  public static Move: string = "Move";
 
   private offset: number = 0;
   private moveCommand?: Command;
@@ -24,7 +24,7 @@ export default class SmoothScroll extends EventDispatcher {
     return SmoothScroll.instance;
   }
 
-  public attach(duration: number = 1000, easing: any = Easing.easeInOutQuart, $anchors: JQuery = $('a[href^="#"]')): void {
+  public attach(duration: number = 1000, easing: EasingFunction = Easing.easeInOutQuart, $anchors: JQuery = $('a[href^="#"]')): void {
     $anchors.on("click", e => {
       // クリックしたaタグのhref属性（リンク先URI）を取得し、変数に格納
       const href: string = $(e.currentTarget).attr("href");
