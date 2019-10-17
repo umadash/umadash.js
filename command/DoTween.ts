@@ -1,5 +1,5 @@
 import { Tween } from "./../tween/Tween";
-import Easing from "./../tween/Easing";
+import Easing, { EasingFunction } from "./../tween/Easing";
 import Command from "./Command";
 
 export default class DoTween extends Command {
@@ -7,7 +7,7 @@ export default class DoTween extends Command {
   private to: any;
   private from: any;
   private duration: number;
-  private easing: any;
+  private easing: EasingFunction;
   private onStart: () => void;
   private onUpdate: () => void;
   private onComplete: () => void;
@@ -33,7 +33,6 @@ export default class DoTween extends Command {
   execute() {
     if (this.onStart) this.onStart();
 
-    // durationが0以上ならアニメーション
     if (this.duration > 0) {
       this.tween = new Tween(this.target, this.to, this.from, this.duration, this.easing, this.onStart, this.onUpdate, this.onComplete);
       this.tween.start();
@@ -52,6 +51,7 @@ export default class DoTween extends Command {
   interrupt() {
     if (this.tween) {
       this.tween.stop();
+      this.tween = null;
     }
   }
 }
