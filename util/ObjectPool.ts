@@ -1,4 +1,4 @@
-export class ObjectPool<T> {
+export default class ObjectPool<T> {
   private onRequire: () => T;
   private onDestroy: (item: T) => void;
   private initCount: number;
@@ -59,5 +59,9 @@ export class ObjectPool<T> {
       this.items.push(item);
     }
     this.index = this.initCount;
+  }
+
+  public getLength(): number {
+    return this.items.length;
   }
 }

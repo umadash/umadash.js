@@ -1,8 +1,7 @@
-import { Easing } from './Easing'
-import { EventDispatcher } from '../event/EventDispatcher';
+import { Easing } from "./Easing";
+import { EventDispatcher } from "../event/EventDispatcher";
 
 export class Tween extends EventDispatcher {
-
   public static FPS: number = 60;
 
   // --------------------------------------------------
@@ -10,7 +9,7 @@ export class Tween extends EventDispatcher {
   // CONSTRUCTOR
   //
   // --------------------------------------------------
-  constructor(target:any, to:object, from:object = null, duration:number = 1000, easing:any = Easing.linear, onStart:any = null, onUpdate:any = null, onComplete:any = null) {
+  constructor(target: any, to: object, from: object = null, duration: number = 1000, easing: any = Easing.linear, onStart: any = null, onUpdate: any = null, onComplete: any = null) {
     super();
 
     this.target = target;
@@ -22,13 +21,12 @@ export class Tween extends EventDispatcher {
     this.progressRate = 0;
 
     this.timer = 0;
-    this.onStart  = onStart;
+    this.onStart = onStart;
     this.onUpdate = onUpdate;
 
     if (onComplete) {
       this.onComplete = onComplete;
-    }
-    else {
+    } else {
       if (onUpdate) this.onComplete = onUpdate;
     }
   }
@@ -38,7 +36,7 @@ export class Tween extends EventDispatcher {
   // METHOD
   //
   // --------------------------------------------------
-  public start():void {
+  public start(): void {
     // すでに開始されていたらストップ
     this.stop();
 
@@ -57,8 +55,7 @@ export class Tween extends EventDispatcher {
         const key = keys[i];
         this.begin[key] = this.target[key];
       }
-    }
-    else {
+    } else {
       for (let i = 0; i < nKeys; i += 1) {
         const key = keys[i];
         this.target[key] = this.begin[key];
@@ -68,7 +65,7 @@ export class Tween extends EventDispatcher {
     // スタート
     if (this.onStart) this.onStart();
 
-    const update:any = () => {
+    const update: () => void = () => {
       // 経過時間
       const past = Date.now() - this.startTime;
 
@@ -90,10 +87,9 @@ export class Tween extends EventDispatcher {
         if (this.onUpdate) this.onUpdate();
         if (this.onComplete) this.onComplete();
         return;
-      }
-      else {
-        const t = past * .001;
-        const d = this.duration * .001;
+      } else {
+        const t = past * 0.001;
+        const d = this.duration * 0.001;
 
         for (let i = 0; i < nKeys; i += 1) {
           const key = keys[i];
@@ -113,38 +109,38 @@ export class Tween extends EventDispatcher {
     this.timer = setInterval(update, 1000 / Tween.FPS);
   }
 
-  public stop():void {
+  public stop(): void {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
     }
   }
 
-  public getIsComplete():boolean {
-    return (this.progressRate >= 1);
+  public getIsComplete(): boolean {
+    return this.progressRate >= 1;
   }
 
   /**
    * キャンセル
    */
-  public cancel():void {
+  public cancel(): void {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
     }
   }
 
-  private target:any;
-  private to:any;
-  private from:any;
-  private duration:number;
-  private easing:any;
-  private onStart:any;
-  private onUpdate:any;
-  private onComplete:any;
-  
-  private begin:any;
-  private startTime:number;
+  private target: any;
+  private to: any;
+  private from: any;
+  private duration: number;
+  private easing: any;
+  private onStart: any;
+  private onUpdate: any;
+  private onComplete: any;
+
+  private begin: any;
+  private startTime: number;
   private timer: any;
-  private progressRate:number;
+  private progressRate: number;
 }

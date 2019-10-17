@@ -1,7 +1,6 @@
-import { Tween } from './../tween/Tween';
-import { Easing } from './../tween/Easing';
+import { Tween } from "./../tween/Tween";
+import { Easing } from "./../tween/Easing";
 import { Command } from "./Command";
-
 
 export class DoTween extends Command {
   private target: any;
@@ -21,8 +20,8 @@ export class DoTween extends Command {
     this.to = to;
     this.from = from;
     this.duration = duration;
-    this.easing   = easing;
-    this.onStart  = onStart;
+    this.easing = easing;
+    this.onStart = onStart;
     this.onUpdate = onUpdate;
     this.onComplete = onComplete;
 
@@ -36,19 +35,9 @@ export class DoTween extends Command {
 
     // durationが0以上ならアニメーション
     if (this.duration > 0) {
-      this.tween = new Tween(
-          this.target,
-          this.to,
-          this.from,
-          this.duration,
-          this.easing,
-          this.onStart,
-          this.onUpdate,
-          this.onComplete
-      );
+      this.tween = new Tween(this.target, this.to, this.from, this.duration, this.easing, this.onStart, this.onUpdate, this.onComplete);
       this.tween.start();
-    }
-    else {
+    } else {
       const keys = Object.keys(this.to);
       for (let i = 0, len = keys.length; i < len; i += 1) {
         const key = keys[i];
