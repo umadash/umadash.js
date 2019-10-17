@@ -1,4 +1,4 @@
-import { Command } from "../command/Command";
+import Command from "../command/Command";
 import { EventDispatcher } from "../event/EventDispatcher";
 
 export default abstract class View<T> extends EventDispatcher {

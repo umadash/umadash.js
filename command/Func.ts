@@ -1,14 +1,11 @@
-import { Command } from "./Command";
+import Command from "./Command";
 
 export class Func extends Command {
-
-
-  public execute():void {
+  public execute(): void {
     if (this.immediatelyComplete) {
       this.callback(this);
       this.notifyComplete();
-    }
-    else {
+    } else {
       this.callback(this);
     }
   }

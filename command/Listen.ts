@@ -1,16 +1,15 @@
-import { Command } from "./Command";
+import Command from "./Command";
 import { EventDispatcher, EventListener } from "../event/EventDispatcher";
 
 export class Listen extends Command {
-
   constructor(target: EventDispatcher, eventName: string) {
     super();
 
     this.target = target;
     this.eventName = eventName;
- }
+  }
 
-  public execute():void {
+  public execute(): void {
     this.listener = () => {
       this.target.removeEventListener(this.eventName, this.listener);
       this.complete();
@@ -18,8 +17,7 @@ export class Listen extends Command {
     this.target.addEventListener(this.eventName, this.listener);
   }
 
-
-  public interrupt():void {
+  public interrupt(): void {
     this.target.removeEventListener(this.eventName, this.listener);
   }
 

@@ -1,8 +1,8 @@
 import { Tween } from "./../tween/Tween";
-import { Easing } from "./../tween/Easing";
-import { Command } from "./Command";
+import Easing from "./../tween/Easing";
+import Command from "./Command";
 
-export class DoTween extends Command {
+export default class DoTween extends Command {
   private target: any;
   private to: any;
   private from: any;

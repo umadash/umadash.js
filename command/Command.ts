@@ -1,15 +1,12 @@
-import { EventDispatcher } from './../event/EventDispatcher';
-import Event from '../event/Event';
+import { EventDispatcher } from "./../event/EventDispatcher";
 
-export class Command extends EventDispatcher {
-
+export default abstract class Command extends EventDispatcher {
   // --------------------------------------------------
   //
   // MEMBER
   //
   // --------------------------------------------------
-  public static Complete: string = 'complete';
-
+  public static Complete: string = "complete";
 
   // --------------------------------------------------
   //
@@ -32,6 +29,6 @@ export class Command extends EventDispatcher {
   }
 
   protected notifyComplete() {
-    this.dispatchEvent(new Event(Command.Complete));
+    this.dispatchEventType(Command.Complete);
   }
 }

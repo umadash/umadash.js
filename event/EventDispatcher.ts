@@ -1,11 +1,8 @@
-import Event from './Event';
-
+import Event from "./Event";
 
 export type EventListener = (event: Event) => void;
 
-
 export class EventDispatcher {
-
   // --------------------------------------------------
   //
   // MEMBER
@@ -22,12 +19,11 @@ export class EventDispatcher {
     this.listeners = {};
   }
 
-
   // --------------------------------------------------
   //
   // METHOD
   //
-  // -------------------------------------------------- 
+  // --------------------------------------------------
   public addEventListener(eventName: string, listener: EventListener): void {
     if (this.listeners[eventName] == null) {
       this.listeners[eventName] = [];
@@ -46,8 +42,7 @@ export class EventDispatcher {
           }
         }
       }
-    }
-    else {
+    } else {
       if (this.listeners[eventName]) {
         this.listeners[eventName] = null;
       }

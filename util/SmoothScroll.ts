@@ -1,24 +1,30 @@
-import { Easing } from "../tween/Easing";
-import { Command } from "../command/Command";
-import { DoTween } from "../command/DoTween";
+import Easing from "../tween/Easing";
+import Command from "../command/Command";
+import DoTween from "../command/DoTween";
 import { EventDispatcher } from "../event/EventDispatcher";
-import Event from "../event/Event";
 
 const $ = jQuery;
 
-export class SmoothScroll {
+export default class SmoothScroll extends EventDispatcher {
+  private static instance: SmoothScroll;
   public static Move: string = "move";
-  private static dispatcher: EventDispatcher = new EventDispatcher();
 
-  public static offset: number = 0;
-  public static moveCommand?: Command;
-  public static scrollTop: number = 0;
+  private offset: number = 0;
+  private moveCommand?: Command;
+  private scrollTop: number = 0;
 
-  public static getDispatcher(): EventDispatcher {
-    return this.dispatcher;
+  private constructor() {
+    super();
   }
 
-  public static attach($anchors: JQuery = $('a[href^="#"]'), duration: number = 800, easing: any = Easing.easeInOutQuart): void {
+  public static getInstance(): SmoothScroll {
+    if (!SmoothScroll.instance) {
+      SmoothScroll.instance = new SmoothScroll();
+    }
+    return SmoothScroll.instance;
+  }
+
+  public attach(duration: number = 1000, easing: any = Easing.easeInOutQuart, $anchors: JQuery = $('a[href^="#"]')): void {
     $anchors.on("click", e => {
       // クリックしたaタグのhref属性（リンク先URI）を取得し、変数に格納
       const href: string = $(e.currentTarget).attr("href");
@@ -38,14 +44,17 @@ export class SmoothScroll {
       this.moveCommand = new DoTween(this, { scrollTop: position }, null, duration, easing, null, () => {
         window.scrollTo(0, this.scrollTop);
       });
+      this.moveCommand.execute();
 
       // 移動イベントを通知
-      this.dispatcher.dispatchEvent(new Event(this.Move));
-
-      this.moveCommand.execute();
+      this.dispatchEventType(SmoothScroll.Move);
 
       // a要素のデフォルトの機能を無効化する
       return false;
     });
+  }
+
+  setOffset(offset) {
+    this.offset = offset;
   }
 }

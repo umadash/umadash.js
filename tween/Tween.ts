@@ -1,4 +1,4 @@
-import { Easing } from "./Easing";
+import Easing from "./Easing";
 import { EventDispatcher } from "../event/EventDispatcher";
 
 export class Tween extends EventDispatcher {

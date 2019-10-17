@@ -1,13 +1,30 @@
-import { Command } from "./Command";
+import Command from "./Command";
 
-export class Wait extends Command {
+export default class Wait extends Command {
+  // --------------------------------------------------
+  //
+  // MEMBER
+  //
+  // --------------------------------------------------
+  private sec: number;
+  private timer: any;
 
+  // --------------------------------------------------
+  //
+  // CONSTRUCTOR
+  //
+  // --------------------------------------------------
   constructor(sec: number) {
     super();
 
     this.sec = sec;
   }
 
+  // --------------------------------------------------
+  //
+  // METHOD
+  //
+  // --------------------------------------------------
   public execute(): void {
     this.timer = setTimeout(() => {
       this.complete();
@@ -15,13 +32,13 @@ export class Wait extends Command {
   }
 
   public interrupt(): void {
-    clearTimeout(this.timer);
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
   }
 
   public complete() {
     super.complete();
   }
-
-  private sec: number;
-  private timer: any;
 }

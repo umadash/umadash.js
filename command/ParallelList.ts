@@ -1,4 +1,4 @@
-import { Command } from "./Command";
+import Command from "./Command";
 
 export class ParallelList extends Command {
   constructor(commands: Command[]) {
@@ -7,7 +7,7 @@ export class ParallelList extends Command {
     this.commands = commands;
   }
 
-  public execute():void {
+  public execute(): void {
     const length = this.commands.length;
     for (let i = 0; i < length; i += 1) {
       const command = this.commands[i];
@@ -17,11 +17,11 @@ export class ParallelList extends Command {
     this.notifyComplete();
   }
 
-  public add(command):void {
+  public add(command): void {
     this.commands.push(command);
   }
 
-  public interrupt():void {
+  public interrupt(): void {
     const length = this.commands.length;
     for (let i = 0; i < length; i += 1) {
       const command = this.commands[i];

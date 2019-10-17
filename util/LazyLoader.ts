@@ -14,14 +14,13 @@
 //         this.init();
 //     }
 
-
 //     public setup() {
 
 //     }
 
 //     public updateByScroll(scrollTop: number, prevScrollTop: number): void {
 //         const down: boolean = (scrollTop - prevScrollTop) >= 0;
-        
+
 //         if (down) {
 //             this.checkDown(scrollTop);
 //         }
@@ -49,7 +48,7 @@
 //         if (over) {
 //             this.currentIndex = nextIndex;
 //             this.dispatchEvent(new Event(PositionManager.Change));
-            
+
 //             this.checkDown(scrollTop);
 //         }
 //     }
@@ -71,7 +70,7 @@
 //     }
 
 //     private init(): void {
-        
+
 //     }
 
 //     private sort(): void {

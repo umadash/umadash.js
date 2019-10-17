@@ -1,7 +1,6 @@
-import { Command } from './Command';
+import Command from "./Command";
 
 export class SerialList extends Command {
-
   // --------------------------------------------------
   //
   // MEMBER
@@ -50,17 +49,16 @@ export class SerialList extends Command {
 
   public next() {
     if (this.commands.length > 0) {
-      const nextCommand:Command = this.commands.shift();
+      const nextCommand: Command = this.commands.shift();
       const callback = () => {
-        nextCommand.removeEventListener('complete', callback);
-       if (this.flgCancel) return;
+        nextCommand.removeEventListener("complete", callback);
+        if (this.flgCancel) return;
         this.next();
       };
       this.currentCommand = nextCommand;
-      nextCommand.addEventListener('complete', callback);
+      nextCommand.addEventListener("complete", callback);
       nextCommand.execute();
-    }
-    else {
+    } else {
       this.notifyComplete();
       this.currentCommand = null;
     }
@@ -85,6 +83,4 @@ export class SerialList extends Command {
       command.interrupt();
     }
   }
-
-
 }

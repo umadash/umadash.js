@@ -1,101 +1,99 @@
-const $ = require('jquery');
+const $ = jQuery;
 
 import { EventDispatcher } from "../event/EventDispatcher";
 import Event from "../event/Event";
 
 export class PositionManager extends EventDispatcher {
+  public static Change: string = "change";
 
-    public static Change: string = 'change';
+  private $sections: JQuery;
+  private ratio: number;
 
-    private $sections: JQuery;
-    private ratio: number;
+  private sections: JQuery[];
+  private currentIndex: number;
+  private prevScrollTop: number;
 
-    private sections: JQuery[];
-    private currentIndex: number;
-    private prevScrollTop: number;
+  constructor($sections: JQuery, ratio: number = 0.5) {
+    super();
 
-    constructor($sections: JQuery, ratio: number = .5) {
-        super();
+    this.$sections = $sections;
+    this.ratio = ratio;
 
-        this.$sections = $sections;
-        this.ratio = ratio;
+    this.sections = [];
+    this.currentIndex = -1;
+    this.prevScrollTop = 0;
 
-        this.sections = [];
-        this.currentIndex = -1;
-        this.prevScrollTop = 0;
+    this.init();
+  }
 
-        this.init();
+  public updateByScroll(scrollTop: number): void {
+    const down: boolean = scrollTop - this.prevScrollTop >= 0;
+
+    if (down) {
+      this.checkDown(scrollTop);
+    } else {
+      this.checkUp(scrollTop);
     }
 
-    public updateByScroll(scrollTop: number): void {
-        const down: boolean = (scrollTop - this.prevScrollTop) >= 0;
-        
-        if (down) {
-            this.checkDown(scrollTop);
-        }
-        else {
-            this.checkUp(scrollTop);
-        }
-        
-        this.prevScrollTop = scrollTop;
+    this.prevScrollTop = scrollTop;
+  }
+
+  public resize(): void {
+    this.sort();
+  }
+
+  public getCurrentIndex(): number {
+    return this.currentIndex;
+  }
+
+  private getCenterPosition(scrollTop): number {
+    return window.innerHeight * this.ratio + scrollTop;
+  }
+
+  private checkDown(scrollTop: number): void {
+    const nextIndex: number = this.currentIndex + 1;
+    if (nextIndex >= this.sections.length) return;
+
+    const $next: JQuery = this.sections[nextIndex];
+    const center: number = this.getCenterPosition(scrollTop);
+    const over: boolean = center > $next.offset().top;
+
+    if (over) {
+      this.currentIndex = nextIndex;
+      this.dispatchEventType(PositionManager.Change);
+
+      this.checkDown(scrollTop);
     }
+  }
 
-    public resize(): void {
-        this.sort();
+  private checkUp(scrollTop: number): void {
+    const nextIndex: number = this.currentIndex;
+    if (nextIndex < 0) return;
+
+    const $next: JQuery = this.sections[nextIndex];
+    const center: number = this.getCenterPosition(scrollTop);
+    const over: boolean = center < $next.offset().top;
+
+    if (over) {
+      this.currentIndex = nextIndex - 1;
+      this.dispatchEvent(new Event(PositionManager.Change));
+
+      this.checkUp(scrollTop);
     }
+  }
 
-    public getCurrentIndex(): number {
-        return this.currentIndex;
-    }
+  private init(): void {
+    this.$sections.each((index: number, element: HTMLElement) => {
+      const $element: JQuery = $(element);
+      this.sections.push($element);
+    });
 
-    private getCenterPosition(scrollTop): number {
-        return window.innerHeight * this.ratio + scrollTop;
-    }
+    this.sort();
+  }
 
-    private checkDown(scrollTop: number): void {
-        const nextIndex: number = this.currentIndex + 1;
-        if (nextIndex >= this.sections.length) return;
-
-        const $next: JQuery = this.sections[nextIndex];
-        const center: number = this.getCenterPosition(scrollTop);
-        const over:boolean = center > $next.offset().top;
-
-        if (over) {
-            this.currentIndex = nextIndex;
-            this.dispatchEvent(new Event(PositionManager.Change));
-            
-            this.checkDown(scrollTop);
-        }
-    }
-
-    private checkUp(scrollTop: number): void {
-        const nextIndex: number = this.currentIndex;
-        if (nextIndex < 0) return;
-
-        const $next: JQuery = this.sections[nextIndex];
-        const center: number = this.getCenterPosition(scrollTop);
-        const over:boolean = center < $next.offset().top;
-
-        if (over) {
-            this.currentIndex = nextIndex - 1;
-            this.dispatchEvent(new Event(PositionManager.Change));
-
-            this.checkUp(scrollTop);
-        }
-    }
-
-    private init(): void {
-        this.$sections.each((index: number, element: HTMLElement) => {
-            const $element: JQuery = $(element);
-            this.sections.push($element);
-        });
-
-        this.sort();
-    }
-
-    private sort(): void {
-        this.sections.sort((a: JQuery, b: JQuery) => {
-            return (a.offset().top < b.offset().top ? -1 : 1);
-        });
-    }
+  private sort(): void {
+    this.sections.sort((a: JQuery, b: JQuery) => {
+      return a.offset().top < b.offset().top ? -1 : 1;
+    });
+  }
 }
