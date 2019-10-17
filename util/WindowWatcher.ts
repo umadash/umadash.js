@@ -5,6 +5,8 @@ export class WindowWatcher extends EventDispatcher {
   private static instance: WindowWatcher;
   public static Scroll: string = "scroll";
   public static Resize: string = "resize";
+  public static VerticalResize: string = "VerticalResize";
+  public static HorizontalResize: string = "HorizontalResize";
 
   private onResizeHandler: () => void;
   private onScrollHandler: () => void;
@@ -41,14 +43,11 @@ export class WindowWatcher extends EventDispatcher {
     const windowWidth: number = window.innerWidth;
     const windowHeight: number = window.innerHeight;
 
-    this.dispatchEvent(
-      new ResizeEvent({
-        windowWidth,
-        windowHeight,
-        horizontalChange: windowWidth != this.prevWindowWidth,
-        verticalChange: windowHeight != this.prevWindowHeight
-      })
-    );
+    const horizontalChange = windowWidth != this.prevWindowWidth;
+    const verticalChange = windowHeight != this.prevWindowHeight;
+    if (horizontalChange || verticalChange) this.dispatchEventType(WindowWatcher.Resize);
+    if (horizontalChange) this.dispatchEventType(WindowWatcher.HorizontalResize);
+    if (verticalChange) this.dispatchEventType(WindowWatcher.VerticalResize);
 
     this.prevWindowWidth = windowWidth;
     this.prevWindowHeight = windowHeight;
