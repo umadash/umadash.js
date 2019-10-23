@@ -1,16 +1,18 @@
 import Command from "../command/Command";
 import { EventDispatcher } from "../event/EventDispatcher";
 
-export default abstract class View<T> extends EventDispatcher {
+export default abstract class View<T = any> extends EventDispatcher {
   private static _id: number = 0;
 
+  private view: T;
   private id: number;
   private showCommand: Command;
   private hideCommand: Command;
 
-  constructor() {
+  constructor(view: T) {
     super();
 
+    this.view = view;
     this.id = View._id++;
   }
 

@@ -1,8 +1,8 @@
 import Command from "./../command/Command";
 import SerialList from "./../command/SerialList";
-import { ParallelList } from "./../command/ParallelList";
+import ParallelList from "./../command/ParallelList";
 
-export class CommandUtil {
+export default class CommandUtil {
   public static serial(commands: (Command | Function)[], execute: boolean = true): SerialList {
     const serial = new SerialList(...commands);
     if (execute) serial.execute();

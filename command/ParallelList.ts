@@ -2,7 +2,7 @@ import Command from "./Command";
 import CommandList from "./CommandLIst";
 import CommandEvent from "./CommandEvent";
 
-export class ParallelList extends CommandList {
+export default class ParallelList extends CommandList {
   constructor(...commands: (Command | Function)[]) {
     super(...commands);
 

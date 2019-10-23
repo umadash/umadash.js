@@ -131,7 +131,7 @@ export default class Slideshow extends EventDispatcher {
     let nextIndex: number = this.currentIndex + 1;
     if (nextIndex >= this.srcs.length) nextIndex = 0;
     this.show(this.srcs[nextIndex]);
-    this.dispatchEventType(Slideshow.Change, { next: nextIndex, prev: this.currentIndex });
+    this.dispatchEventType<ISlideshowData>(Slideshow.Change, this, { next: nextIndex, prev: this.currentIndex });
     this.currentIndex = nextIndex;
 
     this.wait = false;
@@ -148,4 +148,9 @@ export default class Slideshow extends EventDispatcher {
   public setSrcs(srcs: string[]): void {
     this.srcs = srcs;
   }
+}
+
+export interface ISlideshowData {
+  next: number;
+  prev: number;
 }

@@ -25,7 +25,7 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
   protected rightIndex: number;
 
   constructor($elm: JQuery, margin: number, onRequireItem: () => T) {
-    super();
+    super($elm);
 
     this.$elm = $elm;
     this.margin = margin;
