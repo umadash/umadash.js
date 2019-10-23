@@ -1,27 +1,52 @@
 import Command from "./Command";
-import { EventDispatcher, EventListener } from "../event/EventDispatcher";
+import { EventDispatcher } from "../event/EventDispatcher";
 
-export class Listen extends Command {
-  constructor(target: EventDispatcher, eventName: string) {
+export default class Listen extends Command {
+  constructor(eventDispatcher: EventDispatcher, eventName: string) {
     super();
 
-    this.target = target;
+    this.eventDispatcher = eventDispatcher;
     this.eventName = eventName;
   }
 
-  public execute(): void {
-    this.listener = () => {
-      this.target.removeEventListener(this.eventName, this.listener);
-      this.complete();
-    };
-    this.target.addEventListener(this.eventName, this.listener);
+  // --------------------------------------------------
+  //
+  // METHODS
+  //
+  // --------------------------------------------------
+  protected implExecuteFunction(command: Command): void {
+    this.eventDispatcher.addEventListener(this.eventName, this.completeHandler);
   }
 
-  public interrupt(): void {
-    this.target.removeEventListener(this.eventName, this.listener);
+  protected implDestroyFunction(command: Command): void {
+    this.eventDispatcher.removeEventListener(this.eventName, this.completeHandler);
+
+    this.eventDispatcher = null;
+    this.eventName = null;
   }
 
-  private target: EventDispatcher;
+  private completeHandler(): void {
+    this.notifyComplete();
+  }
+
+  // --------------------------------------------------
+  //
+  // MEMBER
+  //
+  // --------------------------------------------------
+  private eventDispatcher: EventDispatcher;
+  public getEventDispatcher(): EventDispatcher {
+    return this.eventDispatcher;
+  }
+  public setEventDispatcher(eventDispatcher: EventDispatcher): void {
+    this.eventDispatcher = eventDispatcher;
+  }
+
   private eventName: string;
-  private listener: () => void;
+  public getEventName(): string {
+    return this.eventName;
+  }
+  public setEventName(eventName: string): void {
+    this.eventName = eventName;
+  }
 }

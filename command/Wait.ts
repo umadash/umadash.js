@@ -1,44 +1,43 @@
 import Command from "./Command";
 
 export default class Wait extends Command {
-  // --------------------------------------------------
-  //
-  // MEMBER
-  //
-  // --------------------------------------------------
-  private sec: number;
-  private timer: any;
-
-  // --------------------------------------------------
-  //
-  // CONSTRUCTOR
-  //
-  // --------------------------------------------------
-  constructor(sec: number) {
+  constructor(sec: number = 1000) {
     super();
 
     this.sec = sec;
+    this.timer = -1;
   }
 
-  // --------------------------------------------------
-  //
-  // METHOD
-  //
-  // --------------------------------------------------
-  public execute(): void {
-    this.timer = setTimeout(() => {
-      this.complete();
-    }, this.sec * 1000);
+  protected implExecuteFunction(command: Command): void {
+    this.timer = window.setTimeout(this.completeHandler, this.sec);
   }
 
-  public interrupt(): void {
-    if (this.timer) {
+  protected implInterruptFunction(command: Command): void {
+    this.cancelTimer();
+  }
+
+  protected implDestroyFunction(command: Command): void {
+    this.cancelTimer();
+  }
+
+  private cancelTimer(): void {
+    if (this.timer != -1) {
       clearTimeout(this.timer);
-      this.timer = null;
+      this.timer = -1;
     }
   }
 
-  public complete() {
-    super.complete();
+  private completeHandler(): void {
+    this.notifyComplete();
   }
+
+  private sec: number;
+  public getSecond(): number {
+    return this.sec;
+  }
+  public setSecond(sec: number): void {
+    this.sec = sec;
+  }
+
+  private timer: number;
 }

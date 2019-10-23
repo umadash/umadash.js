@@ -24,7 +24,7 @@ export class WindowWatcher extends EventDispatcher {
 
   private init(): void {
     this.hasStarted = false;
-    this.prevScrollTop = 0;
+    this.prevScrollTop = -1;
   }
 
   private onScroll(): void {
@@ -75,7 +75,7 @@ export class WindowWatcher extends EventDispatcher {
 
     this.onResizeHandler = null;
     this.onScrollHandler = null;
-
+    this.prevScrollTop = -1;
     this.hasStarted = false;
   }
 

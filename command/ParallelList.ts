@@ -1,33 +1,61 @@
 import Command from "./Command";
+import CommandList from "./CommandLIst";
+import CommandEvent from "./CommandEvent";
 
-export class ParallelList extends Command {
-  constructor(commands: Command[]) {
-    super();
+export class ParallelList extends CommandList {
+  constructor(...commands: (Command | Function)[]) {
+    super(...commands);
 
-    this.commands = commands;
+    this.completeCount = 0;
   }
 
-  public execute(): void {
-    const length = this.commands.length;
-    for (let i = 0; i < length; i += 1) {
-      const command = this.commands[i];
-      command.execute();
-    }
-
-    this.notifyComplete();
-  }
-
-  public add(command): void {
-    this.commands.push(command);
-  }
-
-  public interrupt(): void {
-    const length = this.commands.length;
-    for (let i = 0; i < length; i += 1) {
-      const command = this.commands[i];
-      command.interrupt();
+  public implExecuteFunction(): void {
+    const length: number = this.getLength();
+    if (length > 0) {
+      for (let i: number = 0; i < length; i++) {
+        const command: Command = this.getCommandAt(i);
+        command.addEventListener(CommandEvent.Complete, this.completeHandler);
+        command.execute();
+      }
+    } else {
+      this.notifyComplete();
     }
   }
 
-  private commands: Command[];
+  public implInterruptFunction(): void {
+    const length: number = this.getLength();
+    if (length > 0) {
+      for (let i: number = 0; i < length; i++) {
+        const command: Command = this.getCommandAt(i);
+        command.removeEventListener(CommandEvent.Complete, this.completeHandler);
+        command.interrupt();
+      }
+    }
+  }
+
+  public implDestroyFunction(): void {
+    const length: number = this.getLength();
+    if (length > 0) {
+      for (let i: number = 0; i < length; i++) {
+        const command: Command = this.getCommandAt(i);
+        command.removeEventListener(CommandEvent.Complete, this.completeHandler);
+        command.destroy();
+      }
+    }
+  }
+
+  protected implNotifyBreak(): void {}
+
+  protected implNotifyReturn(): void {}
+
+  private completeHandler(e: CommandEvent): void {
+    if (++this.completeCount >= this.getLength()) {
+      this.notifyComplete();
+    }
+  }
+
+  private completeCount: number;
+  public getCompleteCount(): number {
+    return (this.completeCount = 0);
+  }
 }

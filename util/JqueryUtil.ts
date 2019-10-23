@@ -1,11 +1,11 @@
 import Command from "./../command/Command";
 import DoTween from "../command/DoTween";
-import Easing from "../tween/Easing";
+import Easing, { EasingFunction } from "../tween/Easing";
 
 export class JqueryUtil {
-  public static fadeTo($target: JQuery, opacity: number, duration: number, easing = Easing.linear, switchDisplayTo = "", switchVisibility = false, execute = false): Command {
+  public static fadeTo($target: JQuery, opacity: number, duration: number, easing: EasingFunction = Easing.linear, switchDisplayTo = "", switchVisibility = false, execute = false): Command {
     const o = { value: parseFloat($target.css("opacity")) };
-    const tween = new DoTween(
+    const tween: DoTween = new DoTween(
       o,
       { value: opacity },
       null,
@@ -31,11 +31,11 @@ export class JqueryUtil {
     return tween;
   }
 
-  public static fadeOut(target: JQuery, duration: number, easing: any, switchDisplayTo = "", switchVisibility = false, execute = false): Command {
+  public static fadeOut(target: JQuery, duration: number = 0, easing: EasingFunction = Easing.linear, switchDisplayTo = "", switchVisibility = false, execute = false): Command {
     return JqueryUtil.fadeTo(target, 0, duration, easing, switchDisplayTo, switchVisibility, execute);
   }
 
-  public static fadeIn(target: JQuery, duration: number, easing: any, switchDisplayTo = "", switchVisibility = false, execute = false): Command {
+  public static fadeIn(target: JQuery, duration: number = 0, easing: EasingFunction = Easing.linear, switchDisplayTo = "", switchVisibility = false, execute = false): Command {
     return JqueryUtil.fadeTo(target, 1, duration, easing, switchDisplayTo, switchVisibility, execute);
   }
 
@@ -57,7 +57,7 @@ export class JqueryUtil {
    * @param $target
    * @param pattern
    */
-  public static removeClass($target: JQuery, pattern: string): JQuery {
+  public static removeClassByPattern($target: JQuery, pattern: string): JQuery {
     $target.removeClass(function(index, className) {
       const str = "\\b" + pattern + "\\S+";
       const reg = new RegExp(str, "g");

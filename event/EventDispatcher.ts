@@ -5,17 +5,11 @@ export type EventListener = (event: Event) => void;
 export class EventDispatcher {
   // --------------------------------------------------
   //
-  // MEMBER
-  //
-  // --------------------------------------------------
-  private listeners: any;
-
-  // --------------------------------------------------
-  //
   // CONSTRUCTOR
   //
   // --------------------------------------------------
-  constructor() {
+  constructor(target: any = null) {
+    this.target = target || this;
     this.listeners = {};
   }
 
@@ -25,44 +19,68 @@ export class EventDispatcher {
   //
   // --------------------------------------------------
   public addEventListener(eventName: string, listener: EventListener): void {
-    if (this.listeners[eventName] == null) {
-      this.listeners[eventName] = [];
-    }
-    this.listeners[eventName].push(listener);
-  }
-
-  public removeEventListener(eventName: string, listener: EventListener = null): void {
-    if (listener) {
-      const eventListeners = this.listeners[eventName];
-      if (eventListeners) {
-        for (let i = 0, length = eventListeners.length; i < length; i += 1) {
-          const l = eventListeners[i];
-          if (l === listener) {
-            eventListeners.splice(i, 1);
-          }
-        }
+    let listeners: EventListener[] = this.listeners[eventName];
+    if (listeners) {
+      const length: number = listeners.length;
+      for (let i: number = 0; i < length; i++) {
+        if (listeners[i] === listener) return;
       }
     } else {
-      if (this.listeners[eventName]) {
-        this.listeners[eventName] = null;
+      this.listeners[eventName] = listeners = [];
+    }
+
+    listeners.push(listener);
+  }
+
+  public removeEventListener(eventName: string, listener: EventListener): void {
+    let listeners: EventListener[] = this.listeners[eventName];
+    if (listeners) {
+      const length: number = listeners.length;
+      for (let i: number = 0; i < length; i++) {
+        if (listeners[i] === listener) {
+          listeners.splice(i, 1);
+          break;
+        }
+      }
+
+      if (listeners.length === 0) {
+        delete this.listeners[eventName];
       }
     }
+  }
+
+  public removeAllEventListener(eventName: string = null): void {
+    if (eventName) {
+      delete this.listeners[eventName];
+    } else {
+      this.listeners = {};
+    }
+  }
+
+  public hasEventListener(eventName: string): boolean {
+    return this.listeners[eventName] !== null;
   }
 
   public dispatchEvent(event: Event): void {
-    event.setTarget(this);
-    let listeners = this.listeners[event.getName()];
-    if (listeners == null) return;
+    let listeners: EventListener[] = this.listeners[event.getName()];
 
-    for (var i = 0, length = listeners.length; i < length; i += 1) {
-      var listener = listeners[i];
-      if (listener) {
-        listener(event);
+    if (listeners) {
+      const length: number = listeners.length;
+      for (let i: number = 0; i < length; i++) {
+        listeners[i].call(this.target, event);
       }
     }
   }
 
-  public dispatchEventType(type: string, data: any = null): void {
-    this.dispatchEvent(new Event(type, data));
+  public dispatchEventType<T = any>(type: string, target: Object = null, data: T = null): void {
+    this.dispatchEvent(new Event<T>(type, target, data));
   }
+
+  // --------------------------------------------------
+  //
+  // MEMBER
+  //
+  // --------------------------------------------------
+  private target: any;
+  private listeners: any;
 }

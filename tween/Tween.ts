@@ -1,7 +1,7 @@
-import Easing from "./Easing";
+import Easing, { EasingFunction } from "./../tween/Easing";
 import { EventDispatcher } from "../event/EventDispatcher";
 
-export class Tween extends EventDispatcher {
+export default class Tween extends EventDispatcher {
   public static FPS: number = 60;
 
   // --------------------------------------------------
@@ -9,10 +9,10 @@ export class Tween extends EventDispatcher {
   // CONSTRUCTOR
   //
   // --------------------------------------------------
-  constructor(target: any, to: object, from: object = null, duration: number = 1000, easing: any = Easing.linear, onStart: any = null, onUpdate: any = null, onComplete: any = null) {
+  constructor(object: Object, to: object, from: object = null, duration: number = 1000, easing: any = Easing.linear, onStart: any = null, onUpdate: any = null, onComplete: any = null) {
     super();
 
-    this.target = target;
+    this.object = object;
     this.to = to;
     this.from = from;
     this.duration = duration;
@@ -20,7 +20,7 @@ export class Tween extends EventDispatcher {
 
     this.progressRate = 0;
 
-    this.timer = 0;
+    this.timer = -1;
     this.onStart = onStart;
     this.onUpdate = onUpdate;
 
@@ -39,80 +39,80 @@ export class Tween extends EventDispatcher {
   public start(): void {
     // すでに開始されていたらストップ
     this.stop();
+    if (this.onStart) this.onStart();
 
-    // 開始時間
-    this.startTime = Date.now();
-
-    // オブジェクト更新要素
+    const duration: number = this.duration;
     const keys = Object.keys(this.to);
     const nKeys = keys.length;
 
-    // スタート時の値の保存
-    this.begin = this.from;
-    if (!this.from) {
-      this.begin = {};
+    if (duration > 0) {
+      // オブジェクト更新要素
+
+      // スタート時の値の保存
+      this.begin = this.from;
+      let first: any = this.object;
+      if (this.from) {
+        first = this.from;
+      }
       for (let i = 0; i < nKeys; i += 1) {
         const key = keys[i];
-        this.begin[key] = this.target[key];
+        this.begin[key] = first[key];
       }
+
+      // スタート
+      // 開始時間
+      this.startTime = Date.now();
+
+      const update: () => void = () => {
+        // 経過時間
+        const past = Date.now() - this.startTime;
+
+        // 進行度
+        const rate = past / duration;
+        this.progressRate = rate;
+
+        // 途中か完了か
+        const isComplete = rate >= 1;
+
+        if (isComplete) {
+          this.stop();
+
+          for (let i = 0; i < nKeys; i += 1) {
+            const key = keys[i];
+            this.object[key] = this.to[key];
+          }
+
+          if (this.onUpdate) this.onUpdate();
+          if (this.onComplete) this.onComplete();
+        } else {
+          const t = past * 0.001;
+          const d = duration * 0.001;
+
+          for (let i = 0; i < nKeys; i += 1) {
+            const key = keys[i];
+            const b = this.begin[key];
+            const c = this.to[key] - b;
+            const value = this.easing(t, b, c, d);
+            this.object[key] = value;
+          }
+
+          if (this.onUpdate) this.onUpdate();
+          this.timer = setInterval(update, 1000 / Tween.FPS);
+        }
+      };
     } else {
       for (let i = 0; i < nKeys; i += 1) {
         const key = keys[i];
-        this.target[key] = this.begin[key];
+        this.object[key] = this.to[key];
       }
+      if (this.onComplete) this.onComplete();
     }
-
-    // スタート
-    if (this.onStart) this.onStart();
-
-    const update: () => void = () => {
-      // 経過時間
-      const past = Date.now() - this.startTime;
-
-      // 進行度
-      const rate = past / this.duration;
-      this.progressRate = rate;
-
-      // 途中か完了か
-      const isComplete = !(rate < 1);
-
-      if (isComplete) {
-        for (let i = 0; i < nKeys; i += 1) {
-          const key = keys[i];
-          this.target[key] = this.to[key];
-        }
-
-        // アニメーションストップ
-        this.stop();
-        if (this.onUpdate) this.onUpdate();
-        if (this.onComplete) this.onComplete();
-        return;
-      } else {
-        const t = past * 0.001;
-        const d = this.duration * 0.001;
-
-        for (let i = 0; i < nKeys; i += 1) {
-          const key = keys[i];
-          const b = this.begin[key];
-          const c = this.to[key] - b;
-          const value = this.easing(t, b, c, d);
-          this.target[key] = value;
-        }
-      }
-
-      // コールバックが設定されていなければイベントを発信
-      if (this.onUpdate) {
-        this.onUpdate(this.target);
-      }
-    };
-
-    this.timer = setInterval(update, 1000 / Tween.FPS);
   }
 
   public stop(): void {
-    if (this.timer) {
+    if (this.timer !== -1) {
       clearInterval(this.timer);
-      this.timer = null;
+      this.timer = -1;
     }
   }
 
@@ -120,21 +120,46 @@ export class Tween extends EventDispatcher {
     return this.progressRate >= 1;
   }
 
-  /**
-   * キャンセル
-   */
-  public cancel(): void {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
+  private object: Object;
+  public getObject(): Object {
+    return this.object;
+  }
+  public setObject(object: Object): void {
+    this.object = object;
   }
 
-  private target: any;
   private to: any;
+  public getTo(): any {
+    return this.to;
+  }
+  public setTo(to: any): void {
+    this.to = to;
+  }
+
   private from: any;
+  public getFrom(): any {
+    return this.from;
+  }
+  public setFrom(from: any): void {
+    this.from = from;
+  }
+
   private duration: number;
-  private easing: any;
+  public getDuration(): number {
+    return this.duration;
+  }
+  public setDuration(duration: number): void {
+    this.duration = duration;
+  }
+
+  private easing: EasingFunction;
+  public getEasing(): EasingFunction {
+    return this.easing;
+  }
+  public setEasing(easing: EasingFunction): void {
+    this.easing = easing;
+  }
+
   private onStart: any;
   private onUpdate: any;
   private onComplete: any;

@@ -1,26 +1,18 @@
 import Command from "./Command";
+import CommandList from "./CommandLIst";
+import CommandEvent from "./CommandEvent";
 
-export class SerialList extends Command {
-  // --------------------------------------------------
-  //
-  // MEMBER
-  //
-  // --------------------------------------------------
-  private commands: Command[];
-  private currentCommand: Command;
-  private flgCancel: boolean;
-
+export default class SerialList extends CommandList {
   // --------------------------------------------------
   //
   // CONSTRUCTOR
   //
   // --------------------------------------------------
-  constructor(commands = null) {
-    super();
+  constructor(...commands: (Command | Function)[]) {
+    super(...commands);
 
-    this.commands = commands;
+    this.position = -1;
     this.currentCommand = null;
-    this.flgCancel = false;
   }
 
   // --------------------------------------------------
@@ -28,59 +20,84 @@ export class SerialList extends Command {
   // METHOD
   //
   // --------------------------------------------------
-  public execute() {
-    if (this.commands == null) return;
 
-    this.flgCancel = false;
-    this.next();
+  public addCommand(...commands: (Command | Function)[]) {
+    super.addCommand(...commands);
   }
 
-  public addCommand(command) {
-    if (this.commands == null) this.commands = [];
-    this.commands.push(command);
+  public insertCommand(...commands: (Command | Function)[]) {
+    super.insertCommandAt(this.position + 1, ...commands);
   }
 
-  public addCommands(commands) {
-    if (this.commands == null) this.commands = [];
-    for (let i = 0, length = commands.length; i < length; i += 1) {
-      this.addCommand(commands[i]);
-    }
-  }
-
-  public next() {
-    if (this.commands.length > 0) {
-      const nextCommand: Command = this.commands.shift();
-      const callback = () => {
-        nextCommand.removeEventListener("complete", callback);
-        if (this.flgCancel) return;
-        this.next();
-      };
-      this.currentCommand = nextCommand;
-      nextCommand.addEventListener("complete", callback);
-      nextCommand.execute();
+  protected implExecuteFunction(command: Command): void {
+    this.position = 0;
+    if (this.getLength() > 0) {
+      this.next();
     } else {
       this.notifyComplete();
+    }
+  }
+
+  protected implInterruptFunction(command: Command): void {
+    if (this.currentCommand) {
+      this.currentCommand.removeEventListener(CommandEvent.Complete, this.completeHandler);
+      this.currentCommand.interrupt();
       this.currentCommand = null;
     }
+
+    this.position = -1;
   }
 
-  public interrupt() {
-    if (this.commands == null) return;
-
-    this.flgCancel = true;
-
-    this.interruptAllCommands();
-  }
-
-  public interruptAllCommands() {
+  protected implDestroyFunction(command: Command): void {
     if (this.currentCommand) {
-      this.currentCommand.interrupt();
+      this.currentCommand.removeEventListener(CommandEvent.Complete, this.completeHandler);
+      this.currentCommand.destroy();
+      this.currentCommand = null;
     }
 
-    const length = this.commands.length;
-    for (let i = 0; i < length; i += 1) {
-      const command = this.commands[i];
-      command.interrupt();
+    this.commands = null;
+    this.position = -1;
+    this.currentCommand = null;
+  }
+
+  private next(): void {
+    this.currentCommand = this.getCommandAt(this.position);
+    this.currentCommand.addEventListener(CommandEvent.Complete, this.completeHandler);
+    this.currentCommand.execute();
+  }
+
+  private completeHandler(e: CommandEvent): void {
+    this.currentCommand.removeEventListener(CommandEvent.Complete, this.completeHandler);
+    this.currentCommand.destroy();
+
+    if (++this.position < this.getLength()) {
+      this.next();
+    } else {
+      this.notifyComplete();
     }
+  }
+
+  protected implNotifyBreak(): void {
+    this.currentCommand.removeEventListener(CommandEvent.Complete, this.completeHandler);
+    this.currentCommand = null;
+
+    this.notifyComplete();
+  }
+
+  protected implNotifyReturn(): void {}
+
+  // --------------------------------------------------
+  //
+  // MEMBER
+  //
+  // --------------------------------------------------
+  private currentCommand: Command;
+  public getCurrentCommand(): Command {
+    return this.currentCommand;
+  }
+
+  private position: number;
+  public getPosition(): number {
+    return this.position;
   }
 }
