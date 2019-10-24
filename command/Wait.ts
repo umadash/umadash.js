@@ -27,9 +27,9 @@ export default class Wait extends Command {
     }
   }
 
-  private completeHandler(): void {
+  private completeHandler: () => void = () => {
     this.notifyComplete();
-  }
+  };
 
   private sec: number;
   public getSecond(): number {

@@ -48,11 +48,11 @@ export default class ParallelList extends CommandList {
 
   protected implNotifyReturn(): void {}
 
-  private completeHandler(e: CommandEvent): void {
+  private completeHandler = (e: CommandEvent): void => {
     if (++this.completeCount >= this.getLength()) {
       this.notifyComplete();
     }
-  }
+  };
 
   private completeCount: number;
   public getCompleteCount(): number {

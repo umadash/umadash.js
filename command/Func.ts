@@ -1,5 +1,6 @@
 import Command from "./Command";
 import { EventDispatcher } from "../event/EventDispatcher";
+import Event from "../event/Event";
 
 export default class Func extends Command {
   constructor(func: Function, args: any[] = [], eventDispatcher: EventDispatcher = null, eventName: string = null) {
@@ -38,9 +39,9 @@ export default class Func extends Command {
     this.args = null;
   }
 
-  private completeHandler(): void {
+  private completeHandler = (event: Event): void => {
     this.notifyComplete();
-  }
+  };
 
   // --------------------------------------------------
   //

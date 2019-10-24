@@ -66,7 +66,7 @@ export default class SerialList extends CommandList {
     this.currentCommand.execute();
   }
 
-  private completeHandler(e: CommandEvent): void {
+  private completeHandler = (e: CommandEvent): void => {
     this.currentCommand.removeEventListener(CommandEvent.Complete, this.completeHandler);
     this.currentCommand.destroy();
 
@@ -75,7 +75,7 @@ export default class SerialList extends CommandList {
     } else {
       this.notifyComplete();
     }
-  }
+  };
 
   protected implNotifyBreak(): void {
     this.currentCommand.removeEventListener(CommandEvent.Complete, this.completeHandler);

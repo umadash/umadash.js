@@ -1,5 +1,6 @@
 import Command from "./Command";
 import { EventDispatcher } from "../event/EventDispatcher";
+import Event from "../event/Event";
 
 export default class Listen extends Command {
   constructor(eventDispatcher: EventDispatcher, eventName: string) {
@@ -25,9 +26,9 @@ export default class Listen extends Command {
     this.eventName = null;
   }
 
-  private completeHandler(): void {
+  private completeHandler = (event: Event): void => {
     this.notifyComplete();
-  }
+  };
 
   // --------------------------------------------------
   //
