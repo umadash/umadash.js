@@ -1,7 +1,8 @@
-import Easing, { EasingFunction } from "./../tween/Easing";
-import { EventDispatcher } from "../event/EventDispatcher";
+import { Easing, EasingFunction } from "./../tween/Easing";
 
-export default class Tween extends EventDispatcher {
+export type TweenCallbackFunction = (progressTime: number, progressValue: number) => void;
+
+export class Tween {
   public static FPS: number = 60;
 
   // --------------------------------------------------
@@ -9,26 +10,29 @@ export default class Tween extends EventDispatcher {
   // CONSTRUCTOR
   //
   // --------------------------------------------------
-  constructor(object: Object, to: object, from: object = null, duration: number = 1000, easing: any = Easing.linear, onStart: any = null, onUpdate: any = null, onComplete: any = null) {
-    super();
-
-    this.object = object;
+  constructor(
+    tweenTarget: Object,
+    to: Object,
+    from: Object = null,
+    duration: number = 1000,
+    easing: EasingFunction = Easing.linear,
+    onStart: TweenCallbackFunction = null,
+    onUpdate: TweenCallbackFunction = null,
+    onComplete: TweenCallbackFunction = null
+  ) {
+    this.tweenTarget = tweenTarget;
     this.to = to;
     this.from = from;
     this.duration = duration;
     this.easing = easing;
-
-    this.progressRate = 0;
-
-    this.timer = -1;
     this.onStart = onStart;
     this.onUpdate = onUpdate;
+    this.onComplete = onComplete;
 
-    if (onComplete) {
-      this.onComplete = onComplete;
-    } else {
-      if (onUpdate) this.onComplete = onUpdate;
-    }
+    this.startTime = 0;
+    this.progressValue = 0;
+    this.progressTime = 0;
+    this.timer = -1;
   }
 
   // --------------------------------------------------
@@ -36,96 +40,79 @@ export default class Tween extends EventDispatcher {
   // METHOD
   //
   // --------------------------------------------------
+  private apply(timeRatio: number): void {
+    this.progressTime = timeRatio;
+    const progressValue: number = this.easing(timeRatio);
+
+    const keys: string[] = Object.keys(this.to);
+    const nKeys: number = keys.length;
+
+    for (let i: number = 0; i < nKeys; ++i) {
+      const key: string = keys[i];
+      const value0 = this.internalFrom[key];
+      this.tweenTarget[key] = value0 + (this.to[key] - value0) * progressValue;
+    }
+
+    this.progressValue = progressValue;
+  }
+
   public start(): void {
-    // すでに開始されていたらストップ
-    this.stop();
-    if (this.onStart) this.onStart();
+    this.cancel();
 
-    const duration: number = this.duration;
-    const keys = Object.keys(this.to);
-    const nKeys = keys.length;
+    // set initial values
+    this.internalFrom = {};
+    const keys: string[] = Object.keys(this.to);
+    const nKeys: number = keys.length;
+    for (let i: number = 0; i < nKeys; ++i) {
+      const key: string = keys[i];
+      this.internalFrom[key] = this.from && this.from[key] !== null ? this.from[key] : this.tweenTarget[key];
+    }
 
-    if (duration > 0) {
-      // オブジェクト更新要素
-
-      // スタート時の値の保存
-      this.begin = this.from;
-      let first: any = this.object;
-      if (this.from) {
-        first = this.from;
-      }
-      for (let i = 0; i < nKeys; i += 1) {
-        const key = keys[i];
-        this.begin[key] = first[key];
-      }
-
-      // スタート
-      // 開始時間
+    if (this.duration > 0) {
+      this.timer = window.setInterval(this.intervalHandler, 1000 / Tween.FPS);
       this.startTime = Date.now();
-
-      const update: () => void = () => {
-        // 経過時間
-        const past = Date.now() - this.startTime;
-
-        // 進行度
-        const rate = past / duration;
-        this.progressRate = rate;
-
-        // 途中か完了か
-        const isComplete = rate >= 1;
-
-        if (isComplete) {
-          this.stop();
-
-          for (let i = 0; i < nKeys; i += 1) {
-            const key = keys[i];
-            this.object[key] = this.to[key];
-          }
-
-          if (this.onUpdate) this.onUpdate();
-          if (this.onComplete) this.onComplete();
-        } else {
-          const t = past * 0.001;
-          const d = duration * 0.001;
-
-          for (let i = 0; i < nKeys; i += 1) {
-            const key = keys[i];
-            const b = this.begin[key];
-            const c = this.to[key] - b;
-            const value = this.easing(t, b, c, d);
-            this.object[key] = value;
-          }
-
-          if (this.onUpdate) this.onUpdate();
-          this.timer = setInterval(update, 1000 / Tween.FPS);
-        }
-      };
+      this.apply(0);
+      if (this.onStart) this.onStart(this.progressTime, this.progressValue);
     } else {
-      for (let i = 0; i < nKeys; i += 1) {
-        const key = keys[i];
-        this.object[key] = this.to[key];
-      }
-      if (this.onComplete) this.onComplete();
+      this.apply(0);
+      if (this.onStart) this.onStart(this.progressTime, this.progressValue);
+      this.apply(1);
+      if (this.onUpdate) this.onUpdate(this.progressTime, this.progressValue);
+      if (this.onComplete) this.onComplete(this.progressTime, this.progressValue);
     }
   }
 
-  public stop(): void {
+  public cancel(): void {
     if (this.timer !== -1) {
-      clearInterval(this.timer);
+      window.clearInterval(this.timer);
       this.timer = -1;
     }
   }
 
-  public getIsComplete(): boolean {
-    return this.progressRate >= 1;
-  }
+  private intervalHandler: () => void = () => {
+    const elapsedTime: number = new Date().getTime() - this.startTime;
+    if (elapsedTime < this.duration) {
+      this.apply(elapsedTime / this.duration);
+      if (this.onUpdate) this.onUpdate(this.progressTime, this.progressValue);
+    } else {
+      this.apply(1);
+      this.cancel();
+      if (this.onUpdate) this.onUpdate(this.progressTime, this.progressValue);
+      if (this.onComplete) this.onComplete(this.progressTime, this.progressValue);
+    }
+  };
 
-  private object: Object;
-  public getObject(): Object {
-    return this.object;
+  // --------------------------------------------------
+  //
+  // MEMBER
+  //
+  // --------------------------------------------------
+  private tweenTarget: Object;
+  public getTweenTarget(): Object {
+    return this.tweenTarget;
   }
-  public setObject(object: Object): void {
-    this.object = object;
+  public setTweenTarget(object: Object): void {
+    this.tweenTarget = object;
   }
 
   private to: any;
@@ -160,12 +147,41 @@ export default class Tween extends EventDispatcher {
     this.easing = easing;
   }
 
-  private onStart: any;
-  private onUpdate: any;
-  private onComplete: any;
+  private progressValue: number;
+  public getProgressValue(): number {
+    return this.progressValue;
+  }
 
-  private begin: any;
+  private progressTime: number;
+  public getProgressTime(): number {
+    return this.progressTime;
+  }
+
+  private onStart: TweenCallbackFunction;
+  public getOnStartCallbackFunction(): TweenCallbackFunction {
+    return this.onStart;
+  }
+  public setOnStartCallbackFunction(callback: TweenCallbackFunction): void {
+    this.onStart = callback;
+  }
+
+  private onUpdate: TweenCallbackFunction;
+  public getOnUpdateCallbackFunction(): TweenCallbackFunction {
+    return this.onUpdate;
+  }
+  public setOnUpdateCallbackFunction(callback: TweenCallbackFunction): void {
+    this.onUpdate = callback;
+  }
+
+  private onComplete: TweenCallbackFunction;
+  public getOnCompleteCallbackFunction(): TweenCallbackFunction {
+    return this.onComplete;
+  }
+  public setOnCompleteCallbackFunction(callback: TweenCallbackFunction): void {
+    this.onComplete = callback;
+  }
+
+  private internalFrom: any;
   private startTime: number;
   private timer: any;
-  private progressRate: number;
 }

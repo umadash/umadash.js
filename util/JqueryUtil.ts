@@ -1,12 +1,12 @@
 import Command from "./../command/Command";
 import DoTween from "../command/DoTween";
-import Easing, { EasingFunction } from "../tween/Easing";
+import { Easing, EasingFunction } from "../tween/Easing";
 
-export class JqueryUtil {
+export default class JqueryUtil {
   public static fadeTo($target: JQuery, opacity: number, duration: number, easing: EasingFunction = Easing.linear, switchDisplayTo = "", switchVisibility = false, execute = false): Command {
-    const o = { value: parseFloat($target.css("opacity")) };
+    const object: any = { value: parseFloat($target.css("opacity")) };
     const tween: DoTween = new DoTween(
-      o,
+      object,
       { value: opacity },
       null,
       duration,
@@ -18,7 +18,7 @@ export class JqueryUtil {
         }
       },
       () => {
-        $target.css("opacity", o.value);
+        $target.css("opacity", object.value);
       },
       () => {
         if (opacity <= 0) {

@@ -1,4 +1,4 @@
-import Easing, { EasingFunction } from "../tween/Easing";
+import { Easing, EasingFunction } from "../tween/Easing";
 import Command from "../command/Command";
 import DoTween from "../command/DoTween";
 import { EventDispatcher } from "../event/EventDispatcher";

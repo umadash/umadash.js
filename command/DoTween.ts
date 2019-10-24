@@ -1,56 +1,59 @@
-import Tween from "./../tween/Tween";
-import Easing, { EasingFunction } from "./../tween/Easing";
+import { Tween, TweenCallbackFunction } from "./../tween/Tween";
+import { Easing, EasingFunction } from "./../tween/Easing";
 import Command from "./Command";
 
 export default class DoTween extends Command {
   constructor(
-    object: Object,
-    to: any,
-    from: any = null,
-    duration = 1000,
+    tweenTarget: Object,
+    to: Object,
+    from: Object = null,
+    duration: number = 1000,
     easing: EasingFunction = Easing.linear,
-    startFunction: Function = null,
-    updateFunction: Function = null,
-    completeFunction: Function = null
+    onStart: TweenCallbackFunction = null,
+    onUpdate: TweenCallbackFunction = null,
+    onComplete: TweenCallbackFunction = null
   ) {
     super();
 
-    this.object = object;
+    this.tweenTarget = tweenTarget;
     this.to = to;
     this.from = from;
     this.duration = duration;
     this.easing = easing;
-    this.startFunction = startFunction;
-    this.updateFunction = updateFunction;
-    this.completeFunction = completeFunction;
+    this.onStart = onStart;
+    this.onUpdate = onUpdate;
+    this.onComplete = onComplete;
   }
 
   protected implExecuteFunction(command: Command): void {
-    this.tween = new Tween(this.object, this.to, this.from, this.duration, this.easing, this.startFunction, this.updateFunction, this.completeFunction);
+    this.tween = new Tween(this.tweenTarget, this.to, this.from, this.duration, this.easing, this.onStart, this.onUpdate, (progressTime: number, progressValue: number) => {
+      if (this.onComplete) this.onComplete(progressTime, progressValue);
+      this.notifyComplete();
+    });
     this.tween.start();
-    this.notifyComplete();
   }
 
   protected implInterruptFunction(command: Command): void {
     if (this.tween) {
-      this.tween.stop();
+      this.tween.cancel();
+      this.tween = null;
     }
   }
 
   protected implDestroyFunction(command: Command): void {
     if (this.tween) {
-      this.tween.stop();
+      this.tween.cancel();
       this.tween = null;
     }
 
-    this.object = null;
+    this.tweenTarget = null;
     this.to = null;
     this.from = null;
     this.duration = null;
     this.easing = null;
-    this.startFunction = null;
-    this.updateFunction = null;
-    this.completeFunction = null;
+    this.onStart = null;
+    this.onUpdate = null;
+    this.onComplete = null;
   }
 
   // --------------------------------------------------
@@ -58,12 +61,14 @@ export default class DoTween extends Command {
   // MEMBER
   //
   // --------------------------------------------------
-  private object: Object;
-  public getObject(): Object {
-    return this.object;
+  private tween: Tween;
+
+  private tweenTarget: Object;
+  public getTweenTarget(): Object {
+    return this.tweenTarget;
   }
-  public setObject(object: Object): void {
-    this.object = object;
+  public setTweenTarget(object: Object): void {
+    this.tweenTarget = object;
   }
 
   private to: any;
@@ -98,32 +103,37 @@ export default class DoTween extends Command {
     this.easing = easing;
   }
 
-  private startFunction: Function;
-  public getStartFunction(): Function {
-    return this.startFunction;
-  }
-  public setStartFunction(func: Function): void {
-    this.startFunction = func;
+  private progressValue: number;
+  public getProgressValue(): number {
+    return this.progressValue;
   }
 
-  private updateFunction: Function;
-  public getUpdateFunction(): Function {
-    return this.updateFunction;
-  }
-  public setUpdateFunction(func: Function): void {
-    this.updateFunction = func;
+  private progressTime: number;
+  public getProgressTime(): number {
+    return this.progressTime;
   }
 
-  private completeFunction: Function;
-  public getCompleteFunction(): Function {
-    return this.completeFunction;
+  private onStart: TweenCallbackFunction;
+  public getOnStartCallbackFunction(): TweenCallbackFunction {
+    return this.onStart;
   }
-  public setCompleteFunction(func: Function): void {
-    this.completeFunction = func;
+  public setOnStartCallbackFunction(callback: TweenCallbackFunction): void {
+    this.onStart = callback;
   }
 
-  private tween: Tween;
-  public getTween(): Tween {
-    return this.tween;
+  private onUpdate: TweenCallbackFunction;
+  public getOnUpdateCallbackFunction(): TweenCallbackFunction {
+    return this.onUpdate;
+  }
+  public setOnUpdateCallbackFunction(callback: TweenCallbackFunction): void {
+    this.onUpdate = callback;
+  }
+
+  private onComplete: TweenCallbackFunction;
+  public getOnCompleteCallbackFunction(): TweenCallbackFunction {
+    return this.onComplete;
+  }
+  public setOnCompleteCallbackFunction(callback: TweenCallbackFunction): void {
+    this.onComplete = callback;
   }
 }

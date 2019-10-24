@@ -1,7 +1,7 @@
 const $ = jQuery;
 
 import View from "./View";
-import { JqueryUtil } from "../util/JqueryUtil";
+import JqueryUtil from "../util/JqueryUtil";
 import ObjectPool from "../util/ObjectPool";
 import DOMRecycleViewItem from "./DOMRecycleViewItem";
 

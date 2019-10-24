@@ -1,8 +1,8 @@
 const $ = jQuery;
 
 import Command from "../command/Command";
-import { JqueryUtil } from "../util/JqueryUtil";
-import Easing from "../tween/Easing";
+import JqueryUtil from "../util/JqueryUtil";
+import { Easing } from "../tween/Easing";
 import DOMRecycleViewItem from "./DOMRecycleViewItem";
 import DOMRecycleView from "./DOMRecycleView";
 import { KeyCode } from "../browser/KeyCode";
