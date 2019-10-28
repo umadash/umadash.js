@@ -14,7 +14,7 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
   protected pool: ObjectPool<T>;
   protected width: number = 0;
   protected height: number = 0;
-  protected models: string[] = [];
+  protected models: string[];
   protected modelsLength: number;
   protected items: T[] = [];
 
@@ -24,6 +24,8 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
   // the rightest position item index
   protected rightIndex: number;
 
+  protected hasSetuped: boolean;
+
   constructor($elm: JQuery, margin: number, onRequireItem: () => T) {
     super($elm);
 
@@ -31,16 +33,20 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
     this.margin = margin;
     this.onRequireItem = onRequireItem;
 
-    this._init();
+    this.hasSetuped = false;
   }
 
   public resize(): void {
-    this.width = this.$elm.outerWidth();
-    this.height = this.$elm.outerHeight();
-    this.fill();
+    if (this.hasSetuped) {
+      this.width = this.$elm.outerWidth();
+      this.height = this.$elm.outerHeight();
+      this.fill();
+    }
   }
 
-  private _init(): void {
+  public setup(): void {
+    this.models = [];
+
     // 子要素の幅をattributeに保存する
     const $children: JQuery = this.$elm.children();
     $children.each((index: number, element: HTMLElement) => {
@@ -56,14 +62,20 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
 
     // オブジェクトプールを作る
     this.modelsLength = this.models.length;
-    this.pool = new ObjectPool<T>(
-      this.onRequireItem,
-      (item: DOMRecycleViewItem) => {
-        item.destoroy();
-      },
-      this.modelsLength * 2,
-      this.modelsLength
-    );
+    if (this.pool) {
+      this.pool.reduce();
+    } else {
+      this.pool = new ObjectPool<T>(
+        this.onRequireItem,
+        (item: DOMRecycleViewItem) => {
+          item.destoroy();
+        },
+        this.modelsLength * 2,
+        this.modelsLength
+      );
+    }
+
+    this.hasSetuped = true;
   }
 
   protected getNextLeftIndex(): number {

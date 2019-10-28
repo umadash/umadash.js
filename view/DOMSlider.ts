@@ -36,7 +36,9 @@ export default class DOMSlider<T extends DOMRecycleViewItem> extends DOMRecycleV
   public resize(): void {
     super.resize();
 
-    this.centerize(this.items[0], false);
+    if (this.hasSetuped) {
+      this.centerize(this.items[0], false);
+    }
   }
 
   public centerize(item: DOMRecycleViewItem, animated: boolean = true) {
