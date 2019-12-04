@@ -1,5 +1,5 @@
-import Command from "../command/Command";
-import { EventDispatcher } from "../event/EventDispatcher";
+import Command from "../commands/Command";
+import { EventDispatcher } from "../events/EventDispatcher";
 
 export default abstract class View<T = any> extends EventDispatcher {
   private static _id: number = 0;
@@ -17,12 +17,14 @@ export default abstract class View<T = any> extends EventDispatcher {
 
   public show(): void {
     this.cancelAppearCommands();
-    this.showCommand = this.getShowCommand(true);
+    this.showCommand = this.impGetShowCommand();
+    this.showCommand.execute();
   }
 
   public hide(): void {
     this.cancelAppearCommands();
-    this.hideCommand = this.getHideCommand(true);
+    this.hideCommand = this.impGetHideCommand();
+    this.hideCommand.execute();
   }
 
   private cancelAppearCommands(): void {
@@ -37,8 +39,8 @@ export default abstract class View<T = any> extends EventDispatcher {
     }
   }
 
-  protected abstract getShowCommand(execute: boolean): Command;
-  protected abstract getHideCommand(execute: boolean): Command;
+  protected abstract impGetShowCommand(): Command;
+  protected abstract impGetHideCommand(): Command;
 
   private view: T;
   public getView(): T {

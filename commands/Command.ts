@@ -1,4 +1,4 @@
-import { EventDispatcher } from "./../event/EventDispatcher";
+import { EventDispatcher } from "./../events/EventDispatcher";
 import CommandState from "./CommandState";
 import CommandEvent from "./CommandEvent";
 import CommandList from "./CommandLIst";

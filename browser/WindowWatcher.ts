@@ -1,5 +1,5 @@
-import { EventDispatcher } from "../event/EventDispatcher";
-import Event from "../event/Event";
+import { EventDispatcher } from "../events/EventDispatcher";
+import Event from "../events/Event";
 
 export class WindowWatcher extends EventDispatcher {
   public static Scroll: string = "scroll";

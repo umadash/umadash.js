@@ -1,4 +1,4 @@
-import Event from "../event/Event";
+import Event from "../events/Event";
 
 export default class CommandEvent extends Event {
   // --------------------------------------------------

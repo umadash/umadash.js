@@ -1,23 +1,20 @@
 const $ = jQuery;
 
-import { EventDispatcher } from "../event/EventDispatcher";
-import Event from "../event/Event";
+import { EventDispatcher } from "../../events/EventDispatcher";
+import Event from "../../events/Event";
 
-export class PositionManager extends EventDispatcher {
+export class SectionWatcher extends EventDispatcher {
   public static Change: string = "change";
 
   private $sections: JQuery;
-  private ratio: number;
-
   private sections: JQuery[];
   private currentIndex: number;
   private prevScrollTop: number;
 
-  constructor($sections: JQuery, ratio: number = 0.5) {
+  constructor($sections: JQuery) {
     super();
 
     this.$sections = $sections;
-    this.ratio = ratio;
 
     this.sections = [];
     this.currentIndex = -1;
@@ -47,7 +44,7 @@ export class PositionManager extends EventDispatcher {
   }
 
   private getCenterPosition(scrollTop): number {
-    return window.innerHeight * this.ratio + scrollTop;
+    return window.innerHeight * 0.5 + scrollTop;
   }
 
   private checkDown(scrollTop: number): void {
@@ -60,7 +57,7 @@ export class PositionManager extends EventDispatcher {
 
     if (over) {
       this.currentIndex = nextIndex;
-      this.dispatchEventType(PositionManager.Change);
+      this.dispatchEvent(new Event(SectionWatcher.Change));
 
       this.checkDown(scrollTop);
     }
@@ -76,7 +73,7 @@ export class PositionManager extends EventDispatcher {
 
     if (over) {
       this.currentIndex = nextIndex - 1;
-      this.dispatchEvent(new Event(PositionManager.Change));
+      this.dispatchEvent(new Event(SectionWatcher.Change));
 
       this.checkUp(scrollTop);
     }

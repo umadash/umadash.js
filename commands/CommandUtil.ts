@@ -1,6 +1,6 @@
-import Command from "./../command/Command";
-import SerialList from "./../command/SerialList";
-import ParallelList from "./../command/ParallelList";
+import Command from "./../commands/Command";
+import SerialList from "./../commands/SerialList";
+import ParallelList from "./../commands/ParallelList";
 
 export default class CommandUtil {
   public static serial(commands: (Command | Function)[], execute: boolean = true): SerialList {

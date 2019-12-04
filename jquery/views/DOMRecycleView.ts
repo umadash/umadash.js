@@ -1,8 +1,8 @@
 const $ = jQuery;
 
-import View from "./View";
-import JqueryUtil from "../util/JqueryUtil";
-import ObjectPool from "../util/ObjectPool";
+import View from "../../views/View";
+import JqueryUtil from "../utils/JqueryUtil";
+import ObjectPool from "../../utils/ObjectPool";
 import DOMRecycleViewItem from "./DOMRecycleViewItem";
 
 // interface

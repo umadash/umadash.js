@@ -1,13 +1,13 @@
 const $ = jQuery;
 
-import Command from "../command/Command";
-import JqueryUtil from "../util/JqueryUtil";
+import Command from "../../commands/Command";
+import JqueryUtil from "../utils/JqueryUtil";
 import DOMRecycleViewItem from "./DOMRecycleViewItem";
 import DOMRecycleView from "./DOMRecycleView";
-import DoTween from "../command/DoTween";
-import { Easing } from "../tween/Easing";
+import DoTween from "../../commands/DoTween";
+import { Easing } from "../../tween/Easing";
 
-export default class DOMSlider<T extends DOMRecycleViewItem> extends DOMRecycleView<T> {
+export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DOMRecycleView<T> {
   private duration: number;
   private easing: any;
   private centerItem: DOMRecycleViewItem;

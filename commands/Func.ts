@@ -1,6 +1,6 @@
 import Command from "./Command";
-import { EventDispatcher } from "../event/EventDispatcher";
-import Event from "../event/Event";
+import { EventDispatcher } from "../events/EventDispatcher";
+import Event from "../events/Event";
 
 export default class Func extends Command {
   constructor(func: Function, args: any[] = [], eventDispatcher: EventDispatcher = null, eventName: string = null) {

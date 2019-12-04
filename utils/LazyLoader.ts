@@ -1,7 +1,7 @@
 // const $ = require('jquery');
 
-// import { EventDispatcher } from "../event/EventDispatcher";
-// import Event from "../event/Event";
+// import { EventDispatcher } from "../events/EventDispatcher";
+// import Event from "../events/Event";
 
 // export class LazyLoader extends EventDispatcher {
 

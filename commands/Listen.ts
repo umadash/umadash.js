@@ -1,6 +1,6 @@
 import Command from "./Command";
-import { EventDispatcher } from "../event/EventDispatcher";
-import Event from "../event/Event";
+import { EventDispatcher } from "../events/EventDispatcher";
+import Event from "../events/Event";
 
 export default class Listen extends Command {
   constructor(eventDispatcher: EventDispatcher, eventName: string) {

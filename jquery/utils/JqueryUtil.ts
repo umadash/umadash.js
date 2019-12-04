@@ -1,6 +1,6 @@
-import Command from "./../command/Command";
-import DoTween from "../command/DoTween";
-import { Easing, EasingFunction } from "../tween/Easing";
+import Command from "./../../commands/Command";
+import DoTween from "../../commands/DoTween";
+import { Easing, EasingFunction } from "../../tween/Easing";
 
 export default class JqueryUtil {
   public static fadeTo($target: JQuery, opacity: number, duration: number, easing: EasingFunction = Easing.linear, switchDisplayTo = "", switchVisibility = false, execute = false): Command {

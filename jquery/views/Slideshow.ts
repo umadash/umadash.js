@@ -1,4 +1,4 @@
-import { EventDispatcher } from "../event/EventDispatcher";
+import { EventDispatcher } from "../../events/EventDispatcher";
 
 export default class Slideshow extends EventDispatcher {
   public static Change: string = "Change";
@@ -7,29 +7,31 @@ export default class Slideshow extends EventDispatcher {
   private srcs: string[];
   private interval: number;
   private shuffle: boolean;
+  private attr: string;
 
-  private loaded: number;
   private currentIndex: number;
-  private timer: any;
+  private timer: number;
   private loader: HTMLImageElement;
 
   private wait: boolean;
-  private parameters: any;
 
-  constructor($elm: JQuery, srcs: string[], interval: number = 5, shuffle: boolean = false) {
+  constructor($elm: JQuery, interval: number = 5000, shuffle: boolean = false, attr: string = "data-srcs") {
     super();
 
     this.$elm = $elm;
-    this.srcs = srcs;
     this.interval = interval;
     this.shuffle = shuffle;
+    this.attr = attr;
 
     this.init();
   }
 
   private init(): void {
+    const srcs: string[] = this.$elm.attr(this.attr).split(",");
+    this.srcs = srcs || [];
+
     this.currentIndex = -1;
-    this.loaded = 0;
+    this.timer = -1;
     this.wait = false;
 
     // shuffle
@@ -37,17 +39,6 @@ export default class Slideshow extends EventDispatcher {
       this.srcs.sort(() => {
         return Math.random() - 0.5;
       });
-    }
-  }
-
-  public preload(onComplete: () => void, onError: () => void = null): void {
-    if (this.srcs.length > 0) {
-      this.loadImage(this.srcs[0], onComplete, () => {
-        this.srcs.splice(0, 1);
-        this.preload(onComplete);
-      });
-    } else {
-      onError();
     }
   }
 
@@ -62,23 +53,21 @@ export default class Slideshow extends EventDispatcher {
   }
 
   private startTimer(): void {
-    this.stopTimer();
-
-    this.timer = setTimeout(() => {
-      // 次がすでにロード完了していたら遷移
-      if (this.wait) {
-        this.next();
-      } else {
-        // 完了していなかったらロード完了を待機
-        this.wait = true;
-      }
-    }, this.interval * 1000);
+    this.timer = window.setTimeout(this.timerHandler, this.interval);
   }
 
+  private timerHandler = (): void => {
+    if (this.wait) {
+      this.next();
+    } else {
+      this.wait = true;
+    }
+  };
+
   private stopTimer(): void {
-    if (this.timer) {
+    if (this.timer !== -1) {
       clearTimeout(this.timer);
-      this.timer = null;
+      this.timer = -1;
     }
   }
 
@@ -119,8 +108,14 @@ export default class Slideshow extends EventDispatcher {
     return nextIndex;
   }
 
-  public run(): void {
-    this.next();
+  public start(): void {
+    this.stop();
+
+    if (this.srcs.length > 0) {
+      this.next();
+    } else {
+      console.warn("Slideshow does not have img srcs. You must set img srcs by 'setSrcs' method.");
+    }
   }
 
   public stop(): void {
@@ -128,8 +123,8 @@ export default class Slideshow extends EventDispatcher {
   }
 
   public next(): void {
-    let nextIndex: number = this.currentIndex + 1;
-    if (nextIndex >= this.srcs.length) nextIndex = 0;
+    const nextIndex: number = this.getNextIndex();
+
     this.show(this.srcs[nextIndex]);
     this.dispatchEventType<ISlideshowData>(Slideshow.Change, this, { next: nextIndex, prev: this.currentIndex });
     this.currentIndex = nextIndex;

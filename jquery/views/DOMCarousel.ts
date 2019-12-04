@@ -1,14 +1,14 @@
-const $ = jQuery;
-
-import Command from "../command/Command";
-import JqueryUtil from "../util/JqueryUtil";
-import { Easing } from "../tween/Easing";
+import Command from "../../commands/Command";
+import JqueryUtil from "../utils/JqueryUtil";
+import { Easing } from "../../tween/Easing";
 import DOMRecycleViewItem from "./DOMRecycleViewItem";
 import DOMRecycleView from "./DOMRecycleView";
-import { KeyCode } from "../browser/KeyCode";
+import { KeyCode } from "../../browser/KeyCode";
+
+const $ = jQuery;
 
 // interface
-export default class DOMCarousel<T extends DOMRecycleViewItem> extends DOMRecycleView<T> {
+export default abstract class DOMCarousel<T extends DOMRecycleViewItem> extends DOMRecycleView<T> {
   private speed: number;
   private defaultSpeed: number = 0;
   private request: number = -9999;
