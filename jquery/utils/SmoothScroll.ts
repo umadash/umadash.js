@@ -46,21 +46,24 @@ export default class SmoothScroll extends EventDispatcher {
           // クリックしたaタグのhref属性（リンク先URI）を取得し、変数に格納
           const href: string = $(e.currentTarget).attr("href");
           const $target: JQuery = $(href);
-          const top: number = $target.offset().top;
-          const position: number = top + this.offset;
+          if ($target.length > 0) {
+            const top: number = $target.offset().top;
+            const position: number = top + this.offset;
 
-          // 現在のスクロール位置を取得
-          this.scrollTop = window.scrollY;
-          if (this.moveCommand) {
-            this.moveCommand.interrupt();
-            this.moveCommand = null;
+            // 現在のスクロール位置を取得
+            this.scrollTop = window.scrollY;
+            if (this.moveCommand) {
+              this.moveCommand.interrupt();
+              this.moveCommand = null;
+            }
+            this.moveCommand = new DoTween(this, { scrollTop: position }, null, duration, easing, null, () => {
+              window.scrollTo(0, this.scrollTop);
+            });
+            this.moveCommand.execute();
+            // 移動イベントを通知
+            this.dispatchEventType(SmoothScroll.Move);
           }
-          this.moveCommand = new DoTween(this, { scrollTop: position }, null, duration, easing, null, () => {
-            window.scrollTo(0, this.scrollTop);
-          });
-          this.moveCommand.execute();
-          // 移動イベントを通知
-          this.dispatchEventType(SmoothScroll.Move);
+
           // a要素のデフォルトの機能を無効化する;
           return false;
         });
