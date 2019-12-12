@@ -24,6 +24,7 @@ export default class SmoothScroll extends EventDispatcher {
   }
 
   public attach(duration: number = 1000, easing: EasingFunction = Easing.easeInOutQuart): void {
+    const currentUrl: string = window.location.href.replace(/\/\#[0-9a-zA-Z]+$/, "");
     const $anchors = $("a").each((index: number, element: HTMLElement) => {
       const href: string = element.getAttribute("href");
 
@@ -36,7 +37,8 @@ export default class SmoothScroll extends EventDispatcher {
         if (result) {
           // URLを保持していれば、ハッシュを抜いた状態で
           // 現在開いているページと同じURLか調べる
-          if (result[0] === window.location.href.replace(/\#[0-9a-zA-Z]+$/, "")) {
+          if (result[0] === currentUrl) {
+            // console.log("same");
             element.setAttribute("href", hashResult[0]);
           } else return;
         }
