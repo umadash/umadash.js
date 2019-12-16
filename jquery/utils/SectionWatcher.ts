@@ -65,7 +65,7 @@ export class SectionWatcher extends EventDispatcher {
 
   private checkUp(scrollTop: number): void {
     const nextIndex: number = this.currentIndex;
-    if (nextIndex < 0) return;
+    if (nextIndex <= 0) return;
 
     const $next: JQuery = this.sections[nextIndex];
     const center: number = this.getCenterPosition(scrollTop);
