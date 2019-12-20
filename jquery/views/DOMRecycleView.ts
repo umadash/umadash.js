@@ -31,13 +31,16 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
     this.models = [];
 
     // 子要素の幅をattributeに保存する
+    let maxHeight: number = -9999;
     const $children: JQuery = this.$elm.children();
     $children.each((index: number, element: HTMLElement) => {
       const $elm: JQuery = $(element);
       const width: number = $elm.outerWidth();
       const height: number = $elm.outerHeight();
-      $elm.attr("data-width", width + "");
-      $elm.attr("data-height", height + "");
+
+      maxHeight = height > maxHeight ? height : maxHeight;
+      $elm.attr("data-width", width);
+      $elm.attr("data-height", height);
 
       const txtDom: string = JqueryUtil.getSelfHTML($elm);
       this.models.push(txtDom);
