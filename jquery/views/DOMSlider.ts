@@ -5,7 +5,7 @@ import JqueryUtil from "../utils/JqueryUtil";
 import DOMRecycleViewItem from "./DOMRecycleViewItem";
 import DOMRecycleView from "./DOMRecycleView";
 import DoTween from "../../commands/DoTween";
-import { Easing } from "../../tween/Easing";
+import { EasingFunction } from "../../tween/Easing";
 
 export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DOMRecycleView<T> {
   private duration: number;
@@ -14,31 +14,18 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
   private moveCommand: Command;
   private moveAmount: number;
 
-  constructor($elm: JQuery, margin: number, duration: number, easing: any, onRequireItem: () => T) {
+  constructor($elm: JQuery, margin: number, duration: number, easing: EasingFunction, onRequireItem: () => T) {
     super($elm, margin, onRequireItem);
 
     this.duration = duration;
     this.easing = easing;
 
-    this.init();
-  }
-
-  private init(): void {
     this.moveAmount = 0;
-
-    this.resize();
+    this.centerize(this.displayItems[0], false);
   }
-
-  public start(): void {}
-
-  public stop(): void {}
 
   public resize(): void {
     super.resize();
-
-    if (this.hasSetuped) {
-      this.centerize(this.items[0], false);
-    }
   }
 
   public centerize(item: DOMRecycleViewItem, animated: boolean = true) {
@@ -57,9 +44,9 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
 
       // 動かすすべてのアイテムの現在位置を保存
       let positions: { x: number }[] = [];
-      const length = this.items.length;
+      const length = this.displayItems.length;
       for (let i = 0; i < length; i += 1) {
-        const item: DOMRecycleViewItem = this.items[i];
+        const item: DOMRecycleViewItem = this.displayItems[i];
         positions.push({
           x: item.x
         });
@@ -77,7 +64,7 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
             const position: { x: number } = positions[i];
             const x: number = position.x + this.moveAmount;
 
-            const item: DOMRecycleViewItem = this.items[i];
+            const item: DOMRecycleViewItem = this.displayItems[i];
             item.setX(x);
           }
         },
@@ -93,14 +80,17 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
       const tx: number = (this.width - item.width) / 2;
       this.checkLeftItem(tx);
       this.checkRightItem(tx);
-      this.updateAllItems(tx);
+      this.moveAllItems(tx);
     }
 
     this.centerItem = item;
   }
 
   public moveRight(): void {
-    let nextCenterItem: DOMRecycleViewItem = this.centerItem.leftItem;
+    const index = Math.floor(this.displayItems.length / 2);
+    const nextIndex = index - 1;
+    const nextCenterItem: DOMRecycleViewItem = this.displayItems[nextIndex];
+
     if (nextCenterItem) {
       this.centerize(nextCenterItem);
     } else {
@@ -109,20 +99,14 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
   }
 
   public moveLeft(): void {
-    let nextCenterItem: DOMRecycleViewItem = this.centerItem.rightItem;
+    const index = Math.floor(this.displayItems.length / 2);
+    const nextIndex = index + 1;
+    const nextCenterItem: DOMRecycleViewItem = this.displayItems[nextIndex];
 
     if (nextCenterItem) {
       this.centerize(nextCenterItem);
     } else {
       this.checkRightItem(-1);
     }
-  }
-
-  protected getShowCommand(): Command {
-    return JqueryUtil.fadeIn(this.$elm, 0, Easing.linear, "block", true, false);
-  }
-
-  protected getHideCommand(): Command {
-    return JqueryUtil.fadeOut(this.$elm, 0, Easing.linear, "none", true, false);
   }
 }

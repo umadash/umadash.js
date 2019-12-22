@@ -41,14 +41,14 @@ export default abstract class DOMCarousel<T extends DOMRecycleViewItem> extends 
             const speed = -20;
             this.checkLeftItem(speed);
             this.checkRightItem(speed);
-            this.updateAllItems(speed);
+            this.moveAllItems(speed);
           }
           break;
         case KeyCode.RightArrow:
           const speed = 2;
           this.checkLeftItem(speed);
           this.checkRightItem(speed);
-          this.updateAllItems(speed);
+          this.moveAllItems(speed);
           break;
       }
     });
@@ -87,7 +87,7 @@ export default abstract class DOMCarousel<T extends DOMRecycleViewItem> extends 
 
     this.checkLeftItem(this.speed);
     this.checkRightItem(this.speed);
-    this.updateAllItems(this.speed);
+    this.moveAllItems(this.speed);
 
     this.request = requestAnimationFrame(this.updateFunc);
   }

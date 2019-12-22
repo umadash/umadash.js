@@ -7,25 +7,6 @@ import DOMRecycleViewItem from "./DOMRecycleViewItem";
 
 // interface
 export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> extends View<JQuery> {
-  protected $elm: JQuery;
-  protected margin: number = 0;
-  protected onRequireItem: () => T;
-
-  protected pool: ObjectPool<T>;
-  protected width: number = 0;
-  protected height: number = 0;
-  protected models: string[];
-  protected modelsLength: number;
-  protected items: T[] = [];
-
-  // the leftest position item index
-  protected leftIndex: number;
-
-  // the rightest position item index
-  protected rightIndex: number;
-
-  protected hasSetuped: boolean;
-
   constructor($elm: JQuery, margin: number, onRequireItem: () => T) {
     super($elm);
 
@@ -33,28 +14,33 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
     this.margin = margin;
     this.onRequireItem = onRequireItem;
 
-    this.hasSetuped = false;
+    this.width = this.height = 0;
+
+    this.setup();
+    this.resize();
   }
 
   public resize(): void {
-    if (this.hasSetuped) {
-      this.width = this.$elm.outerWidth();
-      this.height = this.$elm.outerHeight();
-      this.fill();
-    }
+    this.width = this.$elm.outerWidth();
+    this.height = this.$elm.outerHeight();
+    this.fill();
   }
 
   public setup(): void {
+    this.displayItems = [];
     this.models = [];
 
     // 子要素の幅をattributeに保存する
+    let maxHeight: number = -9999;
     const $children: JQuery = this.$elm.children();
     $children.each((index: number, element: HTMLElement) => {
       const $elm: JQuery = $(element);
       const width: number = $elm.outerWidth();
       const height: number = $elm.outerHeight();
-      $elm.attr("data-width", width + "");
-      $elm.attr("data-height", height + "");
+
+      maxHeight = height > maxHeight ? height : maxHeight;
+      $elm.attr("data-width", width);
+      $elm.attr("data-height", height);
 
       const txtDom: string = JqueryUtil.getSelfHTML($elm);
       this.models.push(txtDom);
@@ -68,7 +54,7 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
       this.pool = new ObjectPool<T>(
         this.onRequireItem,
         (item: DOMRecycleViewItem) => {
-          item.destoroy();
+          item.destroy();
         },
         this.modelsLength * 2,
         this.modelsLength
@@ -91,7 +77,7 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
   }
 
   public checkRightItem(tx: number): void {
-    const item: T = this.items[this.items.length - 1];
+    const item: T = this.displayItems[this.displayItems.length - 1];
     if (!item) return;
 
     const directionRight: boolean = tx >= 0;
@@ -100,15 +86,13 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
       const left: number = item.x + tx;
 
       if (left >= this.width) {
-        const oldItem = this.items.pop();
-        oldItem.destoroy();
+        const oldItem = this.displayItems.pop();
+        oldItem.destroy();
         this.pool.returnItem(oldItem);
 
         // インデックスの更新
         const nextIndex: number = this.rightIndex - 1;
         this.rightIndex = nextIndex < 0 ? this.modelsLength - 1 : nextIndex;
-
-        item.leftItem.rightItem = null;
 
         this.checkRightItem(tx);
       }
@@ -117,22 +101,16 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
       if (right <= this.width - this.margin) {
         // 次のモデルのインデックス
         this.rightIndex = this.getNextRightIndex();
-        const htmlString = this.models[this.rightIndex];
+        const model = this.models[this.rightIndex];
 
         // プールから取得してhtmlを渡してアイテムを更新
+        const $elm = $(model).appendTo(this.getView());
         const newItem: T = this.pool.getItem();
-        newItem.attachHTML(htmlString);
-        newItem.willAppear();
-
-        // 位置調整
+        newItem.setup($elm);
         newItem.setX(item.x + item.width + this.margin);
 
         // DOM・配列の一番後ろに追加する
-        this.$elm.append(newItem.$elm);
-        this.items.push(newItem);
-
-        item.rightItem = newItem;
-        newItem.leftItem = item;
+        this.displayItems.push(newItem);
 
         this.checkRightItem(tx);
       }
@@ -140,7 +118,7 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
   }
 
   public checkLeftItem(tx: number): void {
-    const item: T = this.items[0];
+    const item: T = this.displayItems[0];
     if (!item) return;
 
     const directionRight: boolean = tx >= 0;
@@ -151,73 +129,61 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
       if (left >= 0 + this.margin) {
         // 次のモデルのインデックス
         this.leftIndex = this.getNextLeftIndex();
-        const htmlString = this.models[this.leftIndex];
+        const model = this.models[this.leftIndex];
+        const $element = $(model).prependTo(this.getView());
 
         // プールから取得してhtmlを渡してアイテムを更新
         const newItem: T = this.pool.getItem();
-        newItem.attachHTML(htmlString);
-        newItem.willAppear();
-
-        // position
-        const tx: number = item.x - (newItem.width + this.margin);
-        newItem.setX(tx);
-
-        // DOM・配列の一番前に追加する
-        this.$elm.prepend(newItem.$elm);
-        this.items.unshift(newItem);
-
-        newItem.rightItem = item;
-        item.leftItem = newItem;
+        newItem.setup($element);
+        newItem.setX(item.x - (newItem.width + this.margin));
+        this.displayItems.unshift(newItem);
 
         // 再チェック
-        this.checkLeftItem(left);
+        this.checkLeftItem(tx);
       }
     } else {
       // 右端の座標
       const right: number = item.x + item.width + tx;
       if (right <= 0) {
-        const oldItem = this.items.shift();
-        oldItem.destoroy();
+        const oldItem = this.displayItems.shift();
+        oldItem.destroy();
         this.pool.returnItem(oldItem);
 
         const nextIndex: number = this.leftIndex + 1;
         this.leftIndex = nextIndex >= this.modelsLength ? 0 : nextIndex;
-
-        item.rightItem.leftItem = null;
 
         this.checkLeftItem(tx);
       }
     }
   }
 
-  protected updateAllItems(speed: number): void {
-    const length = this.items.length;
+  protected moveAllItems(speed: number): void {
+    const length = this.displayItems.length;
 
     for (let i = 0; i < length; i += 1) {
-      const item: T = this.items[i];
+      const item: T = this.displayItems[i];
       const x: number = item.x + speed;
       item.setX(x);
     }
   }
 
   protected savePositionAllItems(): void {
-    const length = this.items.length;
+    const length = this.displayItems.length;
     for (let i = 0; i < length; i += 1) {
-      const item: T = this.items[i];
+      const item: T = this.displayItems[i];
       item.savePosition();
     }
   }
 
   protected fill(): void {
-    //
     this.$elm.css({ height: "auto" });
 
     // destroy current items
-    for (let i = 0; i < this.items.length; i += 1) {
-      const item: T = this.items[i];
-      item.destoroy();
+    for (let i = 0; i < this.displayItems.length; i += 1) {
+      const item: T = this.displayItems[i];
+      item.destroy();
     }
-    this.items = [];
+    this.displayItems = [];
 
     // プールされているアイテムの削除
     this.pool.reduce();
@@ -229,27 +195,19 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
     const margin: number = this.margin;
     let allWidth: number = 0;
     let count: number = 0;
-    let prevItem: T;
     let maxHeight = -9999;
 
     while (allWidth <= this.width) {
       const model: string = this.models[count++ % this.modelsLength];
+      const $element: JQuery = $(model).appendTo(this.getView());
 
       const item: T = this.pool.getItem();
-      item.attachHTML(model);
-      item.willAppear();
+      item.setup($element);
       item.setX(allWidth);
-      this.$elm.append(item.$elm);
-      this.items.push(item);
+      this.displayItems.push(item);
 
       allWidth += item.width + margin;
       maxHeight = item.height > maxHeight ? item.height : maxHeight;
-
-      if (prevItem) {
-        item.leftItem = prevItem;
-        prevItem.rightItem = item;
-      }
-      prevItem = item;
     }
 
     // 最も左右端にあるアイテムのモデルインデックスを保持
@@ -261,10 +219,29 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
   }
 
   public getLeftestItem(): DOMRecycleViewItem | undefined {
-    return this.items[0];
+    return this.displayItems[0];
   }
 
   public getRightestItem(): DOMRecycleViewItem | undefined {
-    return this.items[this.items.length - 1];
+    return this.displayItems[this.displayItems.length - 1];
   }
+
+  protected $elm: JQuery;
+  protected margin: number;
+  protected onRequireItem: () => T;
+
+  protected pool: ObjectPool<T>;
+  protected width: number;
+  protected height: number;
+  protected models: string[];
+  protected modelsLength: number;
+  protected displayItems: T[];
+
+  // the leftest position item index
+  protected leftIndex: number;
+
+  // the rightest position item index
+  protected rightIndex: number;
+
+  protected hasSetuped: boolean;
 }
