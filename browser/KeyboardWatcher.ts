@@ -5,19 +5,15 @@ export class KeyboardWatcher extends EventDispatcher {
   private constructor() {
     super();
 
-    this.init();
-  }
-
-  private init(): void {
     this.enableKeyboardControl = true;
   }
 
   public start(): void {
-    window.addEventListener(KeyboardEvent.KeyDown, this.keyDownHandler);
+    document.addEventListener(KeyboardEvent.KeyDown, this.keyDownHandler);
   }
 
   public stop(): void {
-    window.removeEventListener(KeyboardEvent.KeyDown, this.keyDownHandler);
+    document.removeEventListener(KeyboardEvent.KeyDown, this.keyDownHandler);
   }
 
   private enableKeyboardControl: boolean;
@@ -42,10 +38,14 @@ export interface IKeyboardEventData {
   keyCode: number;
 }
 
-export class KeyboardEvent<IKeyboardEventData> extends Event {
+export class KeyboardEvent extends Event<IKeyboardEventData> {
   public static KeyDown: string = "keydown";
 
   constructor(eventName: string, data: IKeyboardEventData) {
     super(eventName, null, data);
+  }
+
+  public getKeyCode(): number {
+    return this.getData().keyCode;
   }
 }
