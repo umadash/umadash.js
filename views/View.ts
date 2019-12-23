@@ -9,6 +9,7 @@ export default abstract class View<T = any> extends EventDispatcher {
 
     this.view = view;
     this.id = View._id++;
+    this.isShown = false;
   }
 
   public initialize(): void {}
@@ -16,15 +17,22 @@ export default abstract class View<T = any> extends EventDispatcher {
   public ready(): void {}
 
   public show(): void {
+    if (this.isShown) return;
     this.cancelAppearCommands();
     this.showCommand = this.impGetShowCommand();
     this.showCommand.execute();
+
+    this.isShown = true;
   }
 
   public hide(): void {
+    if (!this.isShown) return;
+
     this.cancelAppearCommands();
     this.hideCommand = this.impGetHideCommand();
     this.hideCommand.execute();
+
+    this.isShown = false;
   }
 
   private cancelAppearCommands(): void {
@@ -50,4 +58,5 @@ export default abstract class View<T = any> extends EventDispatcher {
   private id: number;
   private showCommand: Command;
   private hideCommand: Command;
+  private isShown: boolean;
 }
