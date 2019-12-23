@@ -13,6 +13,7 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
   private centerItem: DOMRecycleViewItem;
   private moveCommand: Command;
   private moveAmount: number;
+  private centerIndex: number;
 
   constructor($elm: JQuery, margin: number, duration: number, easing: EasingFunction, onRequireItem: () => T) {
     super($elm, margin, onRequireItem);
@@ -21,11 +22,16 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
     this.easing = easing;
 
     this.moveAmount = 0;
-    this.centerize(this.displayItems[0], false);
+    this.centerIndex = 0;
   }
 
   public resize(): void {
     super.resize();
+
+    const centerItem: T = this.displayItems[0];
+    if (centerItem) {
+      this.centerize(centerItem, false);
+    }
   }
 
   public centerize(item: DOMRecycleViewItem, animated: boolean = true) {
@@ -90,6 +96,7 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
     const index = Math.floor(this.displayItems.length / 2);
     const nextIndex = index - 1;
     const nextCenterItem: DOMRecycleViewItem = this.displayItems[nextIndex];
+    this.centerIndex = nextIndex;
 
     if (nextCenterItem) {
       this.centerize(nextCenterItem);
@@ -102,6 +109,7 @@ export default abstract class DOMSlider<T extends DOMRecycleViewItem> extends DO
     const index = Math.floor(this.displayItems.length / 2);
     const nextIndex = index + 1;
     const nextCenterItem: DOMRecycleViewItem = this.displayItems[nextIndex];
+    this.centerIndex = nextIndex;
 
     if (nextCenterItem) {
       this.centerize(nextCenterItem);
