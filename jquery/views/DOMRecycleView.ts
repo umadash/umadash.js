@@ -52,6 +52,8 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
       const txtDom: string = JqueryUtil.getSelfHTML($elm);
       this.models.push(txtDom);
     });
+
+    this.maxHeight = maxHeight;
   }
 
   public resize(): void {
@@ -85,7 +87,6 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
     const margin: number = this.margin;
     let allWidth: number = 0;
     let count: number = 0;
-    let maxHeight = -9999;
 
     while (allWidth <= this.width) {
       const model: string = this.models[count++ % this.modelsLength];
@@ -97,7 +98,6 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
       this.displayItems.push(item);
 
       allWidth += item.width + margin;
-      maxHeight = item.height > maxHeight ? item.height : maxHeight;
     }
 
     // 最も左右端にあるアイテムのモデルインデックスを保持
@@ -105,7 +105,7 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
     this.rightIndex = count - 1;
 
     // 高さを揃える
-    this.$elm.css({ height: maxHeight, opacity: 1.0 });
+    this.$elm.css({ height: this.maxHeight, opacity: 1.0 });
   }
 
   public destroy(): void {
@@ -242,6 +242,7 @@ export default abstract class DOMRecycleView<T extends DOMRecycleViewItem> exten
   protected pool: ObjectPool<T>;
   protected width: number;
   protected height: number;
+  protected maxHeight: number;
   protected models: string[];
   protected modelsLength: number;
   protected displayItems: T[];
