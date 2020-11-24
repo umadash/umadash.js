@@ -1,6 +1,6 @@
-import Event from "./Event";
+import Event from "./Event"
 
-export type EventListener = (event: Event) => void;
+export type EventListener = (event: Event) => void
 
 export class EventDispatcher {
   // --------------------------------------------------
@@ -9,8 +9,8 @@ export class EventDispatcher {
   //
   // --------------------------------------------------
   constructor(target: any = null) {
-    this.target = target || this;
-    this.listeners = {};
+    this.target = target || this
+    this.listeners = {}
   }
 
   // --------------------------------------------------
@@ -19,61 +19,65 @@ export class EventDispatcher {
   //
   // --------------------------------------------------
   public addEventListener(eventName: string, listener: EventListener): void {
-    let listeners: EventListener[] = this.listeners[eventName];
+    let listeners: EventListener[] = this.listeners[eventName]
     if (listeners) {
-      const length: number = listeners.length;
-      for (let i: number = 0; i < length; i++) {
-        if (listeners[i] === listener) return;
+      const length: number = listeners.length
+      for (let i = 0; i < length; i++) {
+        if (listeners[i] === listener) return
       }
     } else {
-      this.listeners[eventName] = listeners = [];
+      this.listeners[eventName] = listeners = []
     }
 
-    listeners.push(listener);
+    listeners.push(listener)
   }
 
   public removeEventListener(eventName: string, listener: EventListener): void {
-    let listeners: EventListener[] = this.listeners[eventName];
+    const listeners: EventListener[] = this.listeners[eventName]
     if (listeners) {
-      const length: number = listeners.length;
-      for (let i: number = 0; i < length; i++) {
+      const length: number = listeners.length
+      for (let i = 0; i < length; i++) {
         if (listeners[i] === listener) {
-          listeners.splice(i, 1);
-          break;
+          listeners.splice(i, 1)
+          break
         }
       }
 
       if (listeners.length === 0) {
-        delete this.listeners[eventName];
+        delete this.listeners[eventName]
       }
     }
   }
 
   public removeAllEventListener(eventName: string = null): void {
     if (eventName) {
-      delete this.listeners[eventName];
+      delete this.listeners[eventName]
     } else {
-      this.listeners = {};
+      this.listeners = {}
     }
   }
 
   public hasEventListener(eventName: string): boolean {
-    return this.listeners[eventName] !== null;
+    return this.listeners[eventName] !== null
   }
 
   public dispatchEvent(event: Event): void {
-    let listeners: EventListener[] = this.listeners[event.getName()];
+    const listeners: EventListener[] = this.listeners[event.getName()]
 
     if (listeners) {
-      const length: number = listeners.length;
-      for (let i: number = 0; i < length; i++) {
-        listeners[i].call(this.target, event);
+      const length: number = listeners.length
+      for (let i = 0; i < length; i++) {
+        listeners[i].call(this.target, event)
       }
     }
   }
 
-  public dispatchEventType<T = any>(type: string, target: Object = null, data: T = null): void {
-    this.dispatchEvent(new Event<T>(type, target, data));
+  public dispatchEventType<T = any>(
+    type: string,
+    target: Object = null,
+    data: T = null
+  ): void {
+    this.dispatchEvent(new Event<T>(type, target, data))
   }
 
   // --------------------------------------------------
@@ -81,6 +85,6 @@ export class EventDispatcher {
   // MEMBER
   //
   // --------------------------------------------------
-  private target: any;
-  private listeners: any;
+  private target: any
+  private listeners: any
 }

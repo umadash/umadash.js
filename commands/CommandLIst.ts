@@ -1,12 +1,12 @@
-import Command from "./Command";
-import Func from "./Func";
+import Command from "./Command"
+import Func from "./Func"
 
 export default abstract class CommandList extends Command {
   constructor(...commands: (Command | Function)[]) {
-    super();
+    super()
 
-    this.commands = [];
-    this.addCommand(...commands);
+    this.commands = []
+    this.addCommand(...commands)
   }
 
   // --------------------------------------------------
@@ -16,49 +16,55 @@ export default abstract class CommandList extends Command {
   // --------------------------------------------------
   public addCommand(...commands: (Command | Function)[]): void {
     if (commands.length > 0) {
-      this.preProcess(commands);
-      this.commands = this.commands.concat(<Command[]>commands);
+      this.preProcess(commands)
+      this.commands = this.commands.concat(<Command[]>commands)
     }
   }
 
-  protected insertCommandAt(index: number, ...commands: (Command | Function)[]): void {
-    this.preProcess(commands);
-    Array.prototype.splice.apply(this.commands, (<any[]>[index, 0]).concat(commands));
+  protected insertCommandAt(
+    index: number,
+    ...commands: (Command | Function)[]
+  ): void {
+    this.preProcess(commands)
+    Array.prototype.splice.apply(
+      this.commands,
+      (<any[]>[index, 0]).concat(commands)
+    )
   }
 
   public addCommandArray(commands: (Command | Function)[]) {
-    this.addCommand(...commands);
+    this.addCommand(...commands)
   }
 
   public getLength(): number {
-    return this.commands.length;
+    return this.commands.length
   }
 
   public getCommandAt(index: number): Command {
-    return this.commands[index];
+    return this.commands[index]
   }
 
   // Change Function to Command Func
   private preProcess(commands: (Command | Function)[]): void {
-    const length: number = commands.length;
-    let command: Command | Function;
-    for (let i: number = 0; i < length; i++) {
-      command = commands[i];
-      if (typeof command === "function") command = new Func(command);
-      command.setParent(this);
+    const length: number = commands.length
+    let command: Command | Function
+    for (let i = 0; i < length; i++) {
+      command = commands[i]
+      if (typeof command === "function") command = new Func(command)
+      command.setParent(this)
     }
   }
 
   protected implExecuteFunction(command: Command): void {
-    this.notifyComplete();
+    this.notifyComplete()
   }
 
   protected implInterruptFunction(command: Command): void {}
 
   protected implDestroyFunction(command: Command): void {}
 
-  protected abstract implNotifyBreak(): void;
-  protected abstract implNotifyReturn(): void;
+  protected abstract implNotifyBreak(): void
+  protected abstract implNotifyReturn(): void
 
   // --------------------------------------------------
   //
@@ -66,14 +72,14 @@ export default abstract class CommandList extends Command {
   //
   // --------------------------------------------------
   public getNotifyBreakFunction(): Function {
-    return this.implNotifyBreak || null;
+    return this.implNotifyBreak || null
   }
   public getNotifyReturnFunction(): Function {
-    return this.implNotifyReturn || null;
+    return this.implNotifyReturn || null
   }
 
-  protected commands: Command[];
+  protected commands: Command[]
   public getCommands(): Command[] {
-    return this.commands;
+    return this.commands
   }
 }
